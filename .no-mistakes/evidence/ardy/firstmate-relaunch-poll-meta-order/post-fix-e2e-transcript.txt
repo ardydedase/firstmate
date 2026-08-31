@@ -1,0 +1,99 @@
+
+========== setup: hermetic home with a live claude ship task ==========
+worktree: /home/ardy/.no-mistakes/worktrees/86574f01ec14/01M1BZ4PFVBXMX15CKVNNVM15B
+head:     8701c51f529cab3afc85ca4a62cc93a6ed063e31
+writer:   bin/fm-spawn.sh matches HEAD (fixed writer)
+mode:     accept-expected
+--- /tmp/fm-e2e-accept-expected.C3kBbk/case/home/state/demo.meta ---
+   1  window=fmses:fm-demo
+   2  endpoint_task_id=demo
+   3  worktree=/tmp/fm-e2e-accept-expected.C3kBbk/case/wt
+   4  project=/tmp/fm-e2e-accept-expected.C3kBbk/case/proj
+   5  harness=claude
+   6  kind=ship
+   7  mode=no-mistakes
+   8  yolo=off
+   9  tasktmp=/tmp/fm-e2e-accept-expected.C3kBbk/case/tasktmp
+  10  model=default
+  11  effort=default
+
+========== arm the PR merge poll via the real fm-pr-check.sh (stubbed gh CLI) ==========
+$ fm-pr-check.sh demo https://github.com/example/repo/pull/21
+armed: state/demo.check.sh
+--- /tmp/fm-e2e-accept-expected.C3kBbk/case/home/state/demo.meta ---
+   1  window=fmses:fm-demo
+   2  endpoint_task_id=demo
+   3  worktree=/tmp/fm-e2e-accept-expected.C3kBbk/case/wt
+   4  project=/tmp/fm-e2e-accept-expected.C3kBbk/case/proj
+   5  harness=claude
+   6  kind=ship
+   7  mode=no-mistakes
+   8  yolo=off
+   9  tasktmp=/tmp/fm-e2e-accept-expected.C3kBbk/case/tasktmp
+  10  model=default
+  11  effort=default
+  12  pr=https://github.com/example/repo/pull/21
+  13  pr_head=0123456789abcdef0123456789abcdef01234567
+poll artifacts: case/home/state/demo.check.sh case/home/state/demo.pr-poll case/home/state/demo.pr-poll-registration 
+
+========== relaunch the task via the real fm-control.sh (the reported live command) ==========
+$ fm-control.sh demo relaunch --note "mid-review relaunch"
+warning: /tmp/fm-e2e-accept-expected.C3kBbk/case/home/data/demo/brief.md records no delivery contract line (scaffolded before ship briefs recorded one); launching on the explicit --mode no-mistakes - confirm its definition of done matches
+relaunched demo harness=claude from=claude model=default effort=default backend=tmux endpoint=fmses:fm-demo worktree=/tmp/fm-e2e-accept-expected.C3kBbk/case/wt
+relaunch exit status: 0
+--- /tmp/fm-e2e-accept-expected.C3kBbk/case/home/state/demo.meta ---
+   1  window=fmses:fm-demo
+   2  endpoint_task_id=demo
+   3  worktree=/tmp/fm-e2e-accept-expected.C3kBbk/case/wt
+   4  project=/tmp/fm-e2e-accept-expected.C3kBbk/case/proj
+   5  harness=claude
+   6  kind=ship
+   7  mode=no-mistakes
+   8  yolo=off
+   9  tasktmp=/tmp/fm-demo
+  10  model=default
+  11  effort=default
+  12  busy_gen=g1788182610.1878202.12982
+  13  spawn_gen=s1788182610.1877998.12533
+  14  control_relaunch_tx=1877729.20260831T132330Z.30183
+  15  pr=https://github.com/example/repo/pull/21
+  16  pr_head=0123456789abcdef0123456789abcdef01234567
+meta shape: control_relaunch_tx= was written BEFORE the pr= identity line
+
+========== watcher cycle 1 via the real fm-watch.sh (gh reports the PR MERGED) ==========
+$ FM_TEST_GH_STATE=MERGED fm-watch.sh
+watcher exit status: 0
+watcher stdout:
+  check: /tmp/fm-e2e-accept-expected.C3kBbk/case/home/state/demo.check.sh: merged
+
+========== watcher cycle 2 via the real fm-watch.sh (ordinary check, no rejection) ==========
+$ FM_TEST_GH_STATE=MERGED fm-watch.sh
+watcher exit status: 0
+watcher stdout:
+  check: /tmp/fm-e2e-accept-expected.C3kBbk/case/home/state/z-stop.check.sh: stop-cycle
+
+========== poll state after the watcher cycles ==========
+forge calls the poll made (gh.log):
+  $ gh pr view https://github.com/example/repo/pull/21 --json headRefOid -q .headRefOid
+  $ gh pr view https://github.com/example/repo/pull/21 --json state -q .state
+armed poll retired by the watcher: state/demo.check.sh is gone
+--- /tmp/fm-e2e-accept-expected.C3kBbk/case/home/state/demo.meta ---
+   1  window=fmses:fm-demo
+   2  endpoint_task_id=demo
+   3  worktree=/tmp/fm-e2e-accept-expected.C3kBbk/case/wt
+   4  project=/tmp/fm-e2e-accept-expected.C3kBbk/case/proj
+   5  harness=claude
+   6  kind=ship
+   7  mode=no-mistakes
+   8  yolo=off
+   9  tasktmp=/tmp/fm-demo
+  10  model=default
+  11  effort=default
+  12  busy_gen=g1788182610.1878202.12982
+  13  spawn_gen=s1788182610.1877998.12533
+  14  control_relaunch_tx=1877729.20260831T132330Z.30183
+  15  pr=https://github.com/example/repo/pull/21
+  16  pr_head=0123456789abcdef0123456789abcdef01234567
+
+========== verdict (accept-expected) ==========
+RESULT: the armed PR merge poll survived the relaunch, was validated, observed the merge, and retired
