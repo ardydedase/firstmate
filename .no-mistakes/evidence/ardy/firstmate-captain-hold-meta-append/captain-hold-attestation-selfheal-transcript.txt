@@ -1,0 +1,65 @@
+
+==================================================================
+SCENARIO A: repair a record polluted by the pre-fix append writer
+==================================================================
+
+-- A1. Captain opens a PR review task and asks firstmate to watch the PR
+armed merge poll artifacts: sample-polluted-review.check.sh sample-polluted-review.pr-poll sample-polluted-review.pr-poll-registration 
+poll cycle (PR still open, must stay silent): []
+record tail after arming:
+    spawn_gen=demo-sample-polluted-review
+    pr=https://github.com/example/repo/pull/42
+    pr_head=0123456789abcdef0123456789abcdef01234567
+identity parse: VALID; poll artifacts: VALID
+
+-- A2. The pre-159c1db completion writer appends its attestation (plain >>)
+record tail after the old append:
+    pr=https://github.com/example/repo/pull/42
+    pr_head=0123456789abcdef0123456789abcdef01234567
+    decisions_reviewed=1
+    decision_keys=
+identity parse: REJECTED; poll artifacts: REJECTED
+poll cycle (stays silent on every error by design): []
+
+-- A3. The fixed completion command runs over the polluted record
+fm-captain-hold.sh complete output: complete: sample-polluted-review captain-call inventory reviewed (polluted-armed-call)
+record after the repairing completion (numbered):
+    8:decisions_reviewed=1
+    9:decision_keys=polluted-armed-call
+    10:pr=https://github.com/example/repo/pull/42
+    11:pr_head=0123456789abcdef0123456789abcdef01234567
+identity parse: VALID; poll artifacts: VALID
+exactly one attestation pair (polluted-armed-call), identity block terminal: OK
+
+-- A4. The repaired armed poll still detects the merge
+poll cycle with the PR merged (must emit the merged wake): [merged]
+
+-- A5. Re-arming the poll over the repaired record still works
+identity parse after re-arm: VALID; poll artifacts: VALID
+
+==================================================================
+SCENARIO B: healthy PR-armed record never accumulates pairs
+==================================================================
+
+-- B1. Fresh armed origin, first attestation lands before the identity block
+fm-captain-hold.sh complete output: complete: sample-healthy-review captain-call inventory reviewed
+    8:decisions_reviewed=1
+    9:decision_keys=
+    10:pr=https://github.com/example/repo/pull/43
+    11:pr_head=0123456789abcdef0123456789abcdef01234567
+
+-- B2. Two inventory-growing completions keep exactly one pair
+first growing completion: complete: sample-healthy-review captain-call inventory reviewed (grow-one-call)
+second growing completion: complete: sample-healthy-review captain-call inventory reviewed (grow-one-call,grow-two-call)
+record after both growing completions (numbered):
+    8:decisions_reviewed=1
+    9:decision_keys=grow-one-call,grow-two-call
+    10:pr=https://github.com/example/repo/pull/43
+    11:pr_head=0123456789abcdef0123456789abcdef01234567
+exactly one pair remains, inventory grown to [grow-one-call,grow-two-call]: OK
+identity parse: VALID; poll artifacts: VALID
+
+-- B3. An idempotent retry writes nothing
+record byte-identical after the idempotent retry: OK
+
+ALL CHECKS PASSED
