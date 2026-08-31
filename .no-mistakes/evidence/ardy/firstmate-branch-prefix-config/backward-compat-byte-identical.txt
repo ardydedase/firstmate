@@ -1,0 +1,12 @@
+# Backward compatibility: with config/branch-prefix ABSENT, every ship-mode brief is byte-identical to the base commit
+
+Method: base commit 0866a77 and target commit 2ca9da4 each extracted to the SAME path,
+fm-brief.sh run with the same FM_HOME (no config dir present) for all three modes, outputs compared with cmp.
+
+cmp base-local-only.md target-local-only.md -> identical (5705 bytes)
+cmp base-direct-PR.md target-direct-PR.md -> identical (5489 bytes)
+cmp base-no-mistakes.md target-no-mistakes.md -> identical (7122 bytes)
+
+sha256 of the target no-mistakes-mode default brief (generated with no config present):
+cc221cc8af2f4e7af71edc19d640e023cba8f02dc99ff1425101f20516949dca  target-no-mistakes.md
+cc221cc8af2f4e7af71edc19d640e023cba8f02dc99ff1425101f20516949dca  base-no-mistakes.md
