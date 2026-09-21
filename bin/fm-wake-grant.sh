@@ -29,6 +29,22 @@ owner_matches() { # [<pid>] [<generation>]
   fm_wake_branch_owner_matches "$BRANCH_OWNER" "${1:-}" "${2:-}"
 }
 
+# Rewrite the just-validated owner record carrying the given reserved
+# sequences as its v2 fifth line (empty when none), keeping its pid, identity,
+# and generation as-is. Callers hold the queue lock, so the record stays
+# consistent with the row snapshot they just wrote or removed.
+owner_record_seqs_rewritten() { # <seq>...
+  local IFS=, pid identity generation
+  pid=$(sed -n '2p' "$BRANCH_OWNER")
+  identity=$(sed -n '3p' "$BRANCH_OWNER")
+  generation=$(sed -n '4p' "$BRANCH_OWNER")
+  TMP=$(mktemp "$STATE/.branch-eligible-owner.tmp.XXXXXX") || return 1
+  printf '%s\n%s\n%s\n%s\n%s\n' fm-branch-eligible-owner-v2 "$pid" "$identity" "$generation" "$*" > "$TMP" || return 1
+  chmod 0600 "$TMP" || return 1
+  _fm_atomic_replace "$TMP" "$BRANCH_OWNER" || return 1
+  TMP=
+}
+
 case "${1:-}" in
   activate)
     pid=${2:-}
@@ -39,11 +55,21 @@ case "${1:-}" in
     identity=$(fm_pid_identity "$pid" 2>/dev/null) || exit 1
     [ -n "$identity" ] || exit 1
     TMP=$(mktemp "$STATE/.branch-eligible-owner.tmp.XXXXXX") || exit 1
-    printf '%s\n%s\n%s\n%s\n' fm-branch-eligible-owner-v1 "$pid" "$identity" "$generation" > "$TMP" || exit 1
+    printf '%s\n%s\n%s\n%s\n%s\n' fm-branch-eligible-owner-v2 "$pid" "$identity" "$generation" '' > "$TMP" || exit 1
     chmod 0600 "$TMP" || exit 1
     fm_lock_acquire_wait "$FM_WAKE_QUEUE_LOCK"
     LOCK_HELD=true
     [ "$(fm_pid_identity "$pid" 2>/dev/null || true)" = "$identity" ] || exit 1
+    # A descendant of the lock-holding primary (a compaction child) reaches the
+    # same "owned" walk verdict as the primary itself and would otherwise
+    # clobber the live grant with its transient pid; its later exit would then
+    # deactivate the primary's grant and strand its eligible rows. Refusing a
+    # live different-pid takeover closes that hole; a dead owner is still
+    # replaceable, and the same pid may always reactivate (generation bumps).
+    if owner_matches && [ "$(sed -n '2p' "$BRANCH_OWNER")" != "$pid" ]; then
+      echo "fm-wake-grant.sh: activate refused - a live branch owner holds the grant under a different pid" >&2
+      exit 1
+    fi
     rm -f -- "$BRANCH_ROWS" || exit 1
     _fm_atomic_replace "$TMP" "$BRANCH_OWNER" || exit 1
     TMP=
@@ -82,6 +108,7 @@ case "${1:-}" in
       _fm_atomic_replace "$TMP" "$BRANCH_ROWS" || exit 1
       TMP=
     fi
+    owner_record_seqs_rewritten "$@" || exit 1
     ;;
   release)
     generation=${2:-}
@@ -90,6 +117,11 @@ case "${1:-}" in
     LOCK_HELD=true
     owner_matches '' "$generation" || exit 1
     rm -f -- "$BRANCH_ROWS" || exit 1
+    # Clearing the durable sequence list is what keeps a released grant from
+    # ever being resurrected from its own record: with no row snapshot and no
+    # recorded sequences, a later drain finds nothing to rebuild and keeps
+    # failing loudly as the wiring-bug guard it is.
+    owner_record_seqs_rewritten || exit 1
     ;;
   deactivate)
     pid=${2:-}
