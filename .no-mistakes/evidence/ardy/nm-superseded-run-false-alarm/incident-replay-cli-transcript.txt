@@ -1,0 +1,20 @@
+/tmp/nm-incident-replay/run.sh: line 54: /tmp/nm-incident-replay/lib.sh: No such file or directory
+/tmp/nm-incident-replay/run.sh: line 61: fm_test_tmproot: command not found
+/tmp/nm-incident-replay/run.sh: line 62: fm_git_identity: command not found
+=== Incident replay (failed corpse at old head; replacement RUNNING at new head) ===
+--- base (259a669, pre-fix):
+state: failed · source: run-step · run failed
+--- target (b3fadbe, fixed):
+state: working · source: run-step · validating (background run)
+
+=== Incident replay (cancelled corpse at old head; replacement RUNNING at new head) ===
+--- base (259a669, pre-fix):
+state: failed · source: run-step · run cancelled
+--- target (b3fadbe, fixed):
+state: working · source: run-step · validating (background run)
+
+=== No-widening guard (newest row itself failed - genuine failure, no live run) ===
+--- base (259a669, pre-fix):
+state: failed · source: run-step · run failed
+--- target (b3fadbe, fixed):
+state: failed · source: run-step · run failed
