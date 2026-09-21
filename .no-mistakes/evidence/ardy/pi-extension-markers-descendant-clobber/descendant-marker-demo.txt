@@ -1,0 +1,13 @@
+# Bug 1 evidence: a descendant pi process loading the watch extension records the LOCK-HOLDER pid
+
+Setup: the demo shell's subshell holds `state/.lock`; a node child (the
+"descendant", standing in for a compaction subprocess) imports the real
+`.pi/extensions/fm-primary-pi-watch.ts` and lets its init write the
+`state/.pi-watch-extension-loaded` marker. Expected after the fix: the
+marker's pid line equals the lock-holder pid, not the descendant's own pid.
+
+```
+descendant node pid (must NOT be in the marker): 3348026
+lock-holder pid in state/.lock:                  3348018
+marker pid line:                                  3348018
+```

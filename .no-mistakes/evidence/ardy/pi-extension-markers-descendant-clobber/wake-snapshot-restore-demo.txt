@@ -1,0 +1,51 @@
+# Bug 2 evidence: a lost branch-eligible-rows snapshot no longer wedges wake drain/ack
+
+End-to-end reproduction of the 2026-09-17 episode with the real
+`bin/fm-wake-grant.sh` and `bin/fm-wake-drain.sh`, in one live session so the
+grant owner stays alive (the owner identity line is abridged here):
+
+```
+$ append_wake signal task-a.status  "signal: task-a"
+$ append_wake stale  fm-window      "stale: fm-window"
+$ append_wake check  some-poll.check "check: some-poll.check.sh: merged"   # main-owned
+$ fm-wake-grant.sh activate $$ demo
+$ fm-wake-grant.sh publish demo 1 2
+=== owner record (v2, durable seq list) ===
+fm-branch-eligible-owner-v2
+3353169
+[owner identity: live pid, starttime and cmdline of the demo shell]
+demo
+1,2
+=== durable rows snapshot ===
+1
+2
+=== rm state/.branch-eligible-rows  (the 2026-09-17 loss, before the drain) ===
+wake drain: restored a lost branch-eligible row snapshot from the live owner record
+1790014936	1	signal	task-a.status	signal: task-a
+1790014936	2	stale	fm-window	stale: fm-window
+WAKE_ACK_REQUIRED: after handling completes run bin/fm-wake-drain.sh --ack-through 2 --recovery-generation 3353226.1790014936.UuHVcQ
+branch drain exit=0
+=== rm state/.branch-eligible-rows  (lost again before the ack) ===
+wake drain: restored a lost branch-eligible row snapshot from the live owner record
+branch ack exit=0
+=== queue after branch ack (main-owned check row remains) ===
+1790014936	3	check	some-poll.check	check: some-poll.check.sh: merged
+=== state dir (no leaked tmp files) ===
+(none)
+main drain exit=0
+main ack exit=0
+=== queue after main ack (must be empty) ===
+(end)
+```
+
+Reading the transcript:
+
+- The owner record is the new v2 shape; its fifth line `1,2` is the durable
+  reserved-sequence list written by publish.
+- The rows snapshot is deleted before the branch drain (the 2026-09-17 loss);
+  the drain rebuilds it from the live owner record, presents exactly the two
+  granted rows, and fences out the main-owned check row.
+- The snapshot is deleted again before the acknowledgement; the ack rebuilds
+  it too and succeeds, leaving only the main-owned check row queued.
+- No `.tmp.*` files leak into state, and main subsequently drains and
+  acknowledges its own row, emptying the queue.

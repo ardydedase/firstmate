@@ -1,0 +1,70 @@
+# Regression proof: every new test fails on the pre-fix base and passes on the fix
+
+All suites run with node v22.23.2 (the pi-bundled node, which imports the
+`.ts` extensions natively; the ambient nvm node v18 on this host cannot).
+
+## New tests against the pre-fix base commit 259a669 (source reverted, tests kept)
+
+```
+$ bash tests/fm-wake-queue.test.sh
+not ok - branch drain with a lost snapshot failed: wake drain: no branch-eligible row snapshot at .../actor-restore/state/.branch-eligible-rows; refusing to guess what this actor may consume
+
+$ bash tests/fm-pi-watch-extension.test.sh
+not ok - Pi watch marker must anchor on the lock holder from a descendant: expected exit 0, got 1
+
+$ bash tests/fm-turnend-guard.test.sh
+not ok - Pi guard marker must anchor on the lock holder from a descendant: expected exit 0, got 1
+
+$ bash tests/fm-pi-branch-extension.test.sh
+not ok - the branch marker must anchor on the lock holder: file://.../[eval1]:14
+
+$ bash tests/fm-omp-harness.test.sh   (first environmental test skipped, see below)
+not ok - omp guard marker must anchor on the lock holder from a descendant: expected exit 0, got 1
+```
+
+The wake-queue temp-clobber fix (commit 2419fc5) is also regression-proven
+against the intermediate commit c75794d (fix present, dedicated temps absent):
+
+```
+$ bash tests/fm-wake-queue.test.sh          # bin/ from c75794d
+not ok - a republish leaked .../republish-temps/state/.branch-eligible-rows.tmp.Am0YbR into state
+```
+
+## Same suites against the target commit 2419fc5
+
+```
+$ bash tests/fm-wake-queue.test.sh            -> exit 0, all ok
+$ bash tests/fm-turnend-guard.test.sh         -> exit 0, all ok (90 ok)
+$ bash tests/fm-pi-watch-extension.test.sh    -> exit 0, all ok (50 ok)
+$ bash tests/fm-pi-branch-extension.test.sh   -> exit 0, all ok (46 ok)
+$ bash tests/fm-omp-harness.test.sh           -> exit 0 with one environmental skip (12 ok)
+```
+
+New marker tests confirmed passing by name:
+
+```
+ok - .pi primary extension: the loaded marker anchors on the lock holder from a descendant process
+ok - Pi watch extension marker anchors on the lock holder from a descendant process
+ok - the branch supervision marker names the lock holder, not the branch process
+ok - .omp turn-end guard: the loaded marker anchors on the lock holder from a descendant process
+ok - .omp watch extension: the loaded marker anchors on the lock holder from a descendant process
+ok - a lost branch-eligible row snapshot is rebuilt from the live owner record for both drain and ack
+ok - grant activation refuses a live foreign owner while allowing generation bumps and dead-owner takeover
+ok - a released grant cannot be resurrected from its own record
+ok - an idempotent republish leaves no temp files and keeps the recorded list
+ok - main drain and acknowledgement re-derive a lost or corrupt presented claim
+```
+
+## Known environmental failures inside this harness session (identical on the unmodified base)
+
+- `tests/fm-omp-harness.test.sh` test 1 ("a leaked FM_OMP_HARNESS without an omp
+  ancestor must not relabel a claude worker, got 'pi'"): fails because these
+  runs execute inside a pi harness session, so the ancestry walk genuinely
+  detects a pi ancestor. Verified identical on base commit 259a669; the suite
+  passes fully once that one invocation is skipped, which is how the new omp
+  marker tests above were reached.
+- `tests/fm-pi-watch-extension.test.sh` and `tests/fm-turnend-guard.test.sh`
+  first fail under the ambient node v18 in PATH (ERR_UNKNOWN_FILE_EXTENSION for
+  `.ts`); with node v22.23.2 they pass fully. `tests/fm-pi-branch-extension.test.sh`
+  reports the same node-version issue ("skip: installed
+  @earendil-works/pi-coding-agent package not found") under node 18.
