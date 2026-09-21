@@ -86,6 +86,9 @@ reclaim_stale_branch_grant_locked() {
 # no-evidence case (no live record, a v1 record with no list, an empty list, no
 # surviving rows) falls through to the loud refusal unchanged; a rebuild that
 # cannot be written is fatal, matching claim_main_rows_locked's posture.
+# This regeneration stays inline in the drain rather than a fm-wake-grant.sh
+# subcommand, because every grant subcommand acquires this same queue lock and
+# would deadlock under the drain that already holds it.
 restore_branch_eligible_rows_locked() {
   local seqs restore_tmp
   rows_file_valid "$ELIGIBLE_ROWS_FILE" && return 0
