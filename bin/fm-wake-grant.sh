@@ -34,15 +34,17 @@ owner_matches() { # [<pid>] [<generation>]
 # and generation as-is. Callers hold the queue lock, so the record stays
 # consistent with the row snapshot they just wrote or removed.
 owner_record_seqs_rewritten() { # <seq>...
-  local IFS=, pid identity generation
+  local IFS=, pid identity generation owner_tmp
   pid=$(sed -n '2p' "$BRANCH_OWNER")
   identity=$(sed -n '3p' "$BRANCH_OWNER")
   generation=$(sed -n '4p' "$BRANCH_OWNER")
-  TMP=$(mktemp "$STATE/.branch-eligible-owner.tmp.XXXXXX") || return 1
-  printf '%s\n%s\n%s\n%s\n%s\n' fm-branch-eligible-owner-v2 "$pid" "$identity" "$generation" "$*" > "$TMP" || return 1
-  chmod 0600 "$TMP" || return 1
-  _fm_atomic_replace "$TMP" "$BRANCH_OWNER" || return 1
-  TMP=
+  # A dedicated temp, never the caller's TMP: publish calls this with its own
+  # rows temp possibly still live, and this rewrite must not orphan it.
+  owner_tmp=$(mktemp "$STATE/.branch-eligible-owner.tmp.XXXXXX") || return 1
+  printf '%s\n%s\n%s\n%s\n%s\n' fm-branch-eligible-owner-v2 "$pid" "$identity" "$generation" "$*" > "$owner_tmp" \
+    || { rm -f -- "$owner_tmp"; return 1; }
+  chmod 0600 "$owner_tmp" || { rm -f -- "$owner_tmp"; return 1; }
+  _fm_atomic_replace "$owner_tmp" "$BRANCH_OWNER" || { rm -f -- "$owner_tmp"; return 1; }
 }
 
 case "${1:-}" in
@@ -106,6 +108,12 @@ case "${1:-}" in
     [ "$rc" -eq 0 ] || exit "$rc"
     if [ "$replace" -eq 1 ]; then
       _fm_atomic_replace "$TMP" "$BRANCH_ROWS" || exit 1
+      TMP=
+    else
+      # The existing snapshot already holds this exact content; the rows
+      # temp is no longer needed and must not leak past the owner-record
+      # rewrite that follows.
+      rm -f -- "$TMP"
       TMP=
     fi
     owner_record_seqs_rewritten "$@" || exit 1

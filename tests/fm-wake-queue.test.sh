@@ -1335,6 +1335,29 @@ test_released_grant_does_not_resurrect_from_its_record() {
   pass "a released grant cannot be resurrected from its own record"
 }
 
+# An idempotent republish - the same sequence list, so the existing snapshot
+# already holds the exact content - must not leak its rows temp or its owner
+# record temp into state/, and must keep the recorded sequence list intact.
+test_idempotent_republish_leaves_no_temp_files() {
+  local dir state leaked
+  dir=$(make_case republish-temps)
+  state="$dir/state"
+  append_wake "$state" signal "task-a.status" "signal: task-a" || fail "append failed"
+  append_wake "$state" stale "fm-window" "stale: window" || fail "append failed"
+  FM_STATE_OVERRIDE="$state" "$GRANT" activate "$$" republish-temps \
+    || fail "branch owner activation failed"
+  FM_STATE_OVERRIDE="$state" "$GRANT" publish republish-temps 1 2 \
+    || fail "branch grant publication failed"
+  FM_STATE_OVERRIDE="$state" "$GRANT" publish republish-temps 1 2 \
+    || fail "idempotent republish failed"
+  for leaked in "$state"/.branch-eligible-rows.tmp.* "$state"/.branch-eligible-owner.tmp.*; do
+    [ -e "$leaked" ] && fail "a republish leaked $leaked into state"
+  done
+  [ "$(sed -n '5p' "$state/.branch-eligible-owner")" = "1,2" ] \
+    || fail "idempotent republish changed the recorded sequence list"
+  pass "an idempotent republish leaves no temp files and keeps the recorded list"
+}
+
 # Main's presented-set claim is self-healing: losing or corrupting
 # .main-eligible-rows must never block main's acknowledgement, because the
 # claim is re-derived from the queue under the lock exactly as a fresh drain
@@ -2200,6 +2223,7 @@ test_branch_actor_without_eligible_snapshot_refuses
 test_branch_drain_and_ack_restore_a_lost_eligible_snapshot
 test_grant_activate_refuses_a_live_foreign_owner
 test_released_grant_does_not_resurrect_from_its_record
+test_idempotent_republish_leaves_no_temp_files
 test_main_ack_survives_a_lost_or_corrupt_presented_claim
 test_wake_publish_requires_atomic_recovery_evidence
 test_legacy_generationless_wake_is_adopted

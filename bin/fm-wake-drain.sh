@@ -87,21 +87,24 @@ reclaim_stale_branch_grant_locked() {
 # surviving rows) falls through to the loud refusal unchanged; a rebuild that
 # cannot be written is fatal, matching claim_main_rows_locked's posture.
 restore_branch_eligible_rows_locked() {
-  local seqs
+  local seqs restore_tmp
   rows_file_valid "$ELIGIBLE_ROWS_FILE" && return 0
   fm_wake_branch_owner_matches "$ELIGIBLE_OWNER_FILE" || return 0
   seqs=$(fm_wake_branch_owner_seqs "$ELIGIBLE_OWNER_FILE") || return 0
   [ -n "$seqs" ] || return 0
-  DRAIN_TMP=$(mktemp "$STATE/.branch-eligible-rows.tmp.XXXXXX") || return 1
+  # A dedicated temp, never the caller's DRAIN_TMP: the ack section calls this
+  # with its own live ack temp, and a rebuild here must not consume or clear
+  # that variable for the caller's awk redirect.
+  restore_tmp=$(mktemp "$STATE/.branch-eligible-rows.tmp.XXXXXX") || return 1
   awk -F '\t' -v seqs="$seqs" '
     BEGIN {
       n = split(seqs, wanted, ",")
       for (i = 1; i <= n; i += 1) if (wanted[i] != "") keep[wanted[i]] = 1
     }
     NF >= 5 && $2 ~ /^[0-9]+$/ && ($2 in keep) { print $2 }
-  ' "$FM_WAKE_QUEUE" > "$DRAIN_TMP" || return 1
-  write_rows_file_locked "$ELIGIBLE_ROWS_FILE" "$DRAIN_TMP" || return 1
-  DRAIN_TMP=
+  ' "$FM_WAKE_QUEUE" > "$restore_tmp" || { rm -f -- "$restore_tmp"; return 1; }
+  write_rows_file_locked "$ELIGIBLE_ROWS_FILE" "$restore_tmp" \
+    || { rm -f -- "$restore_tmp"; return 1; }
   rows_file_valid "$ELIGIBLE_ROWS_FILE" || return 0
   echo "wake drain: restored a lost branch-eligible row snapshot from the live owner record" >&2
 }
