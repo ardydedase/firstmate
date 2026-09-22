@@ -1213,19 +1213,19 @@ mod.default(pi);
 const readMarkerPid = () => readFileSync(`${home}/state/.pi-turnend-extension-loaded`, "utf8").trim().split("\n")[1];
 
 // Factory init already marked: it must name the ancestor lock holder, not
-// this transient descendant's own pid.
+// this transient descendant, its own pid excluded.
 if (readMarkerPid() !== holder) {
   throw new Error(`init marker named ${readMarkerPid()}, not the holder ${holder}`);
 }
 
-// An unknown session_start reason exercises the handler's markLoaded path
-// (and spawns no sessionstart script) and must keep the same anchor.
+// An unknown session_start reason exercises the markLoaded path of the
+// handler (and spawns no sessionstart script) and must keep the same anchor.
 await handlers.get("session_start")?.({ type: "session_start", reason: "descendant-probe" }, {});
 if (readMarkerPid() !== holder) {
   throw new Error(`session_start marker named ${readMarkerPid()}, not the holder ${holder}`);
 }
 
-// The descendant's own pid must never be what the marker recorded.
+// The transient descendant pid itself must never be what the marker recorded.
 if (readMarkerPid() === String(process.pid)) {
   throw new Error("marker anchored on the transient descendant pid");
 }
