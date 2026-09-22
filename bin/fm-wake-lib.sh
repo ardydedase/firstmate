@@ -268,8 +268,10 @@ fm_pi_extension_loaded() {
 
 # fm_pi_extension_owns_supervision <state> <root>
 # True when a LIVE Pi session owns supervision continuity for this home: both
-# primary extensions are loaded at their current on-disk builds by the process
-# recorded in this home's session lock, and that process is still alive.
+# primary extensions are loaded at their current on-disk builds with their
+# state markers naming the process recorded in this home's session lock -
+# which a descendant of that session records on the holder's behalf rather
+# than under its own transient pid - and that process is still alive.
 # Requiring the turn-end guard extension too is deliberate - it is the structural
 # backstop that catches a cycle the watch extension failed to restore, so a home
 # missing it has no benign hand-off to tolerate.
