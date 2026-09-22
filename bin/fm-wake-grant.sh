@@ -31,8 +31,9 @@ owner_matches() { # [<pid>] [<generation>]
 
 # Rewrite the just-validated owner record carrying the given reserved
 # sequences as its v2 fifth line (empty when none), keeping its pid, identity,
-# and generation as-is. Callers hold the queue lock, so the record stays
-# consistent with the row snapshot they just wrote or removed.
+# and generation as-is. Callers hold the queue lock and rewrite this record
+# before publishing or removing the row snapshot, so a crash never leaves
+# live sequences naming a snapshot the caller already moved past.
 owner_record_seqs_rewritten() { # <seq>...
   local IFS=, pid identity generation owner_tmp
   pid=$(sed -n '2p' "$BRANCH_OWNER")
@@ -106,17 +107,20 @@ case "${1:-}" in
     ' "$FM_WAKE_QUEUE"
     rc=$?
     [ "$rc" -eq 0 ] || exit "$rc"
+    # The record rewrites before the snapshot publishes: a crash between them
+    # either leaves a stale-but-valid snapshot filtering already-acked
+    # sequences, or, on first publish, no snapshot at all, which the next
+    # drain rebuilds from this fresh record.
+    owner_record_seqs_rewritten "$@" || exit 1
     if [ "$replace" -eq 1 ]; then
       _fm_atomic_replace "$TMP" "$BRANCH_ROWS" || exit 1
       TMP=
     else
-      # The existing snapshot already holds this exact content; the rows
-      # temp is no longer needed and must not leak past the owner-record
-      # rewrite that follows.
+      # The existing snapshot already holds this exact content; only the
+      # rows temp remains to discard.
       rm -f -- "$TMP"
       TMP=
     fi
-    owner_record_seqs_rewritten "$@" || exit 1
     ;;
   release)
     generation=${2:-}
@@ -124,12 +128,16 @@ case "${1:-}" in
     fm_lock_acquire_wait "$FM_WAKE_QUEUE_LOCK"
     LOCK_HELD=true
     owner_matches '' "$generation" || exit 1
-    rm -f -- "$BRANCH_ROWS" || exit 1
     # Clearing the durable sequence list is what keeps a released grant from
     # ever being resurrected from its own record: with no row snapshot and no
     # recorded sequences, a later drain finds nothing to rebuild and keeps
-    # failing loudly as the wiring-bug guard it is.
+    # failing loudly as the wiring-bug guard it is. The record must clear
+    # before the snapshot is removed: a crash between them then leaves a
+    # stale-but-valid snapshot filtering nothing, while the old order left
+    # live sequences with no snapshot for the next drain to rebuild into
+    # already-released wakes.
     owner_record_seqs_rewritten || exit 1
+    rm -f -- "$BRANCH_ROWS" || exit 1
     ;;
   deactivate)
     pid=${2:-}
