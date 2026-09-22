@@ -1,0 +1,20 @@
+Descendant-marker regression: base (da9607d) vs fixed (077a914) fm-primary-turnend-guard.ts
+
+Driver: a real node process writes state/.lock naming its parent as the holder,
+imports the extension as a genuine descendant (the Pi compaction-child shape),
+fires the session_start handler, and prints which pid the loaded marker records.
+
+=== base extension ===
+lock holder pid:              20097
+transient descendant (node): 20100
+marker pid after init:        20100
+marker pid after session_start: 20100
+VERDICT: marker anchored on the TRANSIENT DESCENDANT (bug reproduced)
+
+=== fixed extension ===
+lock holder pid:              20097
+transient descendant (node): 20159
+marker pid after init:        20097
+marker pid after session_start: 20097
+VERDICT: marker anchored on the LOCK HOLDER (correct)
+
