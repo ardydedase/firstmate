@@ -672,7 +672,11 @@ else
   exit 1
 fi
 DRAIN_LOCK_HELD=true
-[ "$ACTOR" != branch ] || restore_branch_eligible_rows_locked || exit 1
+# Any actor rebuilds a lost eligible-row snapshot from the live v2 owner
+# record before reclaim or claiming, so a snapshot lost mid-grant can never
+# leave a main drain claiming the branch's granted rows while the grant
+# still fences main out of them.
+restore_branch_eligible_rows_locked || exit 1
 reclaim_stale_branch_grant_locked || exit 1
 [ "$ACTOR" != main ] || retire_unconsumable_rows_locked
 [ "$ACTOR" != branch ] || require_branch_eligible_rows || exit 1

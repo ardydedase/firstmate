@@ -1268,6 +1268,47 @@ test_branch_drain_and_ack_restore_a_lost_eligible_snapshot() {
   pass "a lost branch-eligible row snapshot is rebuilt from the live owner record for both drain and ack"
 }
 
+# The main-first durability shape: the row snapshot disappears between the
+# branch's publish and the branch's next drain, and a MAIN drain runs first.
+# That drain rebuilds the reservation from the live owner record before
+# claiming, so main stays fenced out of the granted rows instead of claiming
+# and presenting them while the branch later presents them again. Do not
+# regress it.
+test_main_drain_rebuilds_a_lost_eligible_snapshot_before_claiming() {
+  local dir state out err
+  dir=$(make_case actor-main-first)
+  state="$dir/state"
+
+  append_wake "$state" check "some-poll.check.sh" "check: some-poll.check.sh: merged" \
+    || fail "main-only append failed"
+  append_wake "$state" signal "task-a.status" "signal: task-a" || fail "signal append failed"
+  append_wake "$state" stale "fm-window" "stale: fm-window" || fail "stale append failed"
+
+  FM_STATE_OVERRIDE="$state" "$GRANT" activate "$$" actor-main-first || fail "branch owner activation failed"
+  FM_STATE_OVERRIDE="$state" "$GRANT" publish actor-main-first 2 3 || fail "branch grant publication failed"
+
+  rm -f -- "$state/.branch-eligible-rows"
+
+  out="$dir/main-drain.out"
+  err="$dir/main-drain.err"
+  FM_STATE_OVERRIDE="$state" "$DRAIN" > "$out" 2> "$err" \
+    || fail "main drain with a lost snapshot failed: $(cat "$err")"
+  grep -Fq "restored a lost branch-eligible row snapshot" "$err" \
+    || fail "the main drain did not rebuild the lost snapshot: $(cat "$err")"
+  grep -Fq "$(printf '\tcheck\tsome-poll.check.sh\t')" "$out" || fail "main drain omitted its main-owned check row"
+  grep -Fq "$(printf '\tsignal\ttask-a.status\t')" "$out" && fail "main drain claimed the live branch grant's signal row"
+  grep -Fq "$(printf '\tstale\tfm-window\t')" "$out" && fail "main drain claimed the live branch grant's stale row"
+
+  out="$dir/branch-drain.out"
+  err="$dir/branch-drain.err"
+  FM_STATE_OVERRIDE="$state" FM_SUPERVISION_ACTOR=branch "$DRAIN" > "$out" 2> "$err" \
+    || fail "branch drain after the main-side rebuild failed: $(cat "$err")"
+  grep -Fq "$(printf '\tsignal\ttask-a.status\t')" "$out" || fail "branch drain omitted its eligible signal row"
+  grep -Fq "$(printf '\tstale\tfm-window\t')" "$out" || fail "branch drain omitted its eligible stale row"
+
+  pass "a main drain rebuilds a lost eligible snapshot and stays fenced out of the branch rows"
+}
+
 # The grant is keyed to one live owner: an activate from a different live pid
 # - the descendant-of-the-primary shape - must be refused so the descendant can
 # neither clobber the snapshot nor deactivate the live owner's grant when it
@@ -2221,6 +2262,7 @@ test_actor_filter_precedes_same_key_deduplication
 test_main_reclaims_a_grant_whose_branch_owner_exited
 test_branch_actor_without_eligible_snapshot_refuses
 test_branch_drain_and_ack_restore_a_lost_eligible_snapshot
+test_main_drain_rebuilds_a_lost_eligible_snapshot_before_claiming
 test_grant_activate_refuses_a_live_foreign_owner
 test_released_grant_does_not_resurrect_from_its_record
 test_idempotent_republish_leaves_no_temp_files
