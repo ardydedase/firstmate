@@ -1,0 +1,38 @@
+Manual end-to-end reproduction of Bug 1 (pi extension loaded-marker pid clobber).
+
+Scenario: a live lock-holder session (the evidence shell) holds state/.lock; a
+transient descendant node process (the compaction-child shape) imports the real
+tracked extension file fm-primary-turnend-guard.ts and its factory init runs
+markLoaded(). The driver prints the marker's recorded pid next to the holder pid
+and its own descendant pid.
+
+Driver (run once against the base commit's extension and once against this
+branch's extension, node v22.23.2):
+  const holder = String(process.ppid);
+  writeFileSync(`${home}/state/.lock`, `${holder}\n`);
+  const mod = await import(pathToFileURL(process.env.PLUGIN).href);
+  mod.default({ on() {} });
+  ... print marker-pid, lock-holder-pid, descendant-pid
+
+RESULT at base commit 8c1cdb768a8c6b2e6656c94885467d8e9e16bbb8 (the bug):
+  marker-pid=2786655
+  lock-holder-pid=2786654
+  descendant-pid=2786655
+  -> the marker recorded the transient descendant's own pid; when that
+     descendant exits, the marker names a dead pid while the lock holder is
+     still live (the observed 2026-09-10 incident shape).
+
+RESULT at branch head f4c658a3a5f9baf4babd1613f452c378a82fa35d (the fix):
+  marker-pid=2786672
+  lock-holder-pid=2786672
+  descendant-pid=2786673
+  -> the marker anchors on the lock-holder pid resolved by the ownership walk,
+     so it survives the descendant's exit.
+
+The same anchored behavior is covered by automated tests that pass on this
+branch (node v22.23.2):
+  ok - .pi primary extension: the loaded marker anchors on the lock holder from a descendant process
+  ok - Pi watch extension marker anchors on the lock holder from a descendant process
+  ok - the branch supervision marker names the lock holder, not the branch process
+including cold-start (no lock file -> writer's own pid) and live foreign
+holder (nothing written) sub-cases.

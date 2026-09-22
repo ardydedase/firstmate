@@ -1,0 +1,23 @@
+End-to-end run of tests/fm-wake-queue.test.sh (node v22.23.2, branch head
+f4c658a3a5f9baf4babd1613f452c378a82fa35d): the suite drives the REAL
+bin/fm-wake-grant.sh and bin/fm-wake-drain.sh scripts through a full accepted
+branch wake cycle, deletes state/.branch-eligible-rows between publish and
+acknowledgement, and asserts the drain and the ack each rebuild it.
+
+Full suite: rc=0, 47 ok, 0 not ok.
+
+Excerpt around the descendant-clobber durability scenario:
+
+  ok - a branch-actor drain with no eligible-row snapshot refuses loudly instead of draining nothing
+  wake drain: restored a lost branch-eligible row snapshot from the live owner record
+  ok - a lost branch-eligible row snapshot is rebuilt from the live owner record for both drain and ack
+  ok - grant activation refuses a live foreign owner while allowing generation bumps and dead-owner takeover
+  ok - a released grant cannot be resurrected from its own record
+  ok - an idempotent republish leaves no temp files and keeps the recorded list
+  ok - main drain and acknowledgement re-derive a lost or corrupt presented claim
+
+The "wake drain: restored ..." line is the live drain script's own stderr
+after rm -f state/.branch-eligible-rows against a published grant: the lost
+snapshot no longer wedges drain/ack, main stays fenced out of the restored
+reservation, the main-owned check row is not swallowed by the branch ack, and
+the refusal-with-no-live-record posture is unchanged.
