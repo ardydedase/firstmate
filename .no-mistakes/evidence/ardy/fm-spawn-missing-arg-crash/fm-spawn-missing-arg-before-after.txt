@@ -1,0 +1,44 @@
+fm-spawn.sh argument-validation fix: before/after CLI transcripts
+Base commit: c643b5779a29fc7ff1a8805fa3ff2603093b7f61  Target commit: f11753268f14a98b2ec300b214ca978ef5c442a6
+
+===================================================================
+Failure mode 1: ship spawn missing <project-dir> (task id only)
+===================================================================
+--- BEFORE (base) ---
+$ bin/fm-spawn.sh missing-z1 --mode direct-PR --yolo off --effort high
+exit=1
+bin/fm-spawn.sh: line 1797: POS[1]: unbound variable
+
+--- AFTER (fixed) ---
+$ bin/fm-spawn.sh missing-z1 --mode direct-PR --yolo off --effort high
+exit=2
+error: a ship or scout spawn requires a <project-dir> positional after the task id (e.g. projects/<name>)
+Spawn a direct report: a crewmate in a treehouse or Orca worktree, or a
+secondmate in its isolated firstmate home.
+  ... (full usage block follows) ...
+
+===================================================================
+Failure mode 2: bare project name instead of projects/<name>
+===================================================================
+--- BEFORE (base) ---
+$ bin/fm-spawn.sh bare-z3 spatialx --mode direct-PR --yolo off --effort high
+exit=1
+bin/fm-spawn.sh: line 2811: cd: spatialx: No such file or directory
+
+--- AFTER (fixed) ---
+$ bin/fm-spawn.sh bare-z3 spatialx --mode direct-PR --yolo off --effort high
+exit=2
+error: project directory 'spatialx' does not resolve to a directory (pass projects/<name> or a directory path)
+Spawn a direct report: a crewmate in a treehouse or Orca worktree, or a
+secondmate in its isolated firstmate home.
+  ... (full usage block follows) ...
+
+===================================================================
+Focused test run through the official dispatcher
+===================================================================
+$ bin/fm-test-run.sh tests/fm-spawn-missing-arg.test.sh tests/fm-spawn-dispatch-profile.test.sh tests/fm-spawn-worktree-settle.test.sh tests/fm-spawn-pool-base-freshen.test.sh tests/fm-spawn-compact-adviser-disable.test.sh
+FM_TEST_SUMMARY total=5 failed=0 skipped_gate=0
+
+Registration check: a change to bin/fm-spawn.sh selects the new test:
+$ bin/fm-test-run.sh --list-scheduled --changed --base c643b577
+  ... tests/fm-spawn-missing-arg.test.sh (selected)
