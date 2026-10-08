@@ -29,8 +29,9 @@
 #     already recorded - same task, verdict, wake text, handling token,
 #     silence class, summary text, and captured status identity (status
 #     endpoint plus status-filesystem identity), the original row still
-#     unprocessed and still within OUTCOME_DUPLICATE_WINDOW_SECONDS (default
-#     120, overridable through FM_OUTCOME_DUPLICATE_WINDOW for tests) - into
+#     unprocessed and - for a re-mint carrying no handling token - still
+#     within OUTCOME_DUPLICATE_WINDOW_SECONDS (default 120, overridable
+#     through FM_OUTCOME_DUPLICATE_WINDOW for tests) - into
 #     that existing record: it writes nothing, prints the existing record's
 #     seq (stdout keeps being only the sequence number, so every caller's
 #     parse is unchanged), and prints one "duplicate:" line to stderr so a
@@ -49,9 +50,9 @@
 #     long the one prompt carrying it runs. The window bounds only the
 #     token-less residual (unscoped fleet reviews and caller-less appends),
 #     deliberately far below the watcher's repeat cadence. The silence class
-#     is structural, never prose: a silent fleet
-#     no-op and a visible fleet action remain separate records even inside one
-#     handling. Legacy rows without handling normalize to the empty token "",
+#     is structural, never prose: a silent fleet no-op and a visible fleet
+#     action remain separate records even inside one handling. Legacy rows
+#     without handling normalize to the empty token "",
 #     and without status provenance to the empty capture (endpoint 0, ident
 #     "-"), so they dedup against a candidate only when that candidate's own
 #     values are equally empty. The collapse changes no lifecycle state: the
@@ -214,9 +215,8 @@ OUTCOME_TAIL_MAX_BYTES=1048576
 # the whole life of that record's unprocessed span, while a later token-less
 # event that arrives with the same wake text over an unchanged status log is a
 # separate event and must record; repeats of that shape are observed an hour
-# apart, so the default stays far
-# below them. FM_OUTCOME_DUPLICATE_WINDOW lets a test use a small window
-# without sleeping.
+# apart, so the default stays far below them. FM_OUTCOME_DUPLICATE_WINDOW
+# lets a test use a small window without sleeping.
 OUTCOME_DUPLICATE_WINDOW_SECONDS=${FM_OUTCOME_DUPLICATE_WINDOW:-120}
 # The "recordedAgo" field present and unprocessed add to captain rows (see the
 # usage above).
@@ -366,18 +366,18 @@ capture_status_position() { # <task>
 
 # The re-mint guard behind the append dedup (header "Re-mint dedup"): print the
 # newest stored outcome sequence whose event identity matches the candidate
-# exactly, whose record is still unprocessed, and whose record is - when
-# the re-mint carries no handling token - still within
-# OUTCOME_DUPLICATE_WINDOW_SECONDS, or print nothing
-# when this is a new event. Identity is structural: task,
-# verdict, the wake line the reporter names, the handling token the caller
-# names (the wake-row claim of the handling re-minting, empty for callers
-# without one), the record's silence class, the record's summary text, and
-# the captured status event (the status log's byte endpoint plus its
-# filesystem identity), never the summary prose alone. Summary equality is
-# a narrowing conjunction, never a sufficient key: structural identity must
-# match too, because one handling may carry several distinct dispositions of
-# one task and prose alone must never decide a collapse. The silence class
+# exactly, whose record is still unprocessed, and whose record is - when the
+# re-mint carries no handling token - still within
+# OUTCOME_DUPLICATE_WINDOW_SECONDS, or print nothing when this is a new event.
+# Identity is structural: task, verdict, the wake line the reporter names, the
+# handling token the caller names (the wake-row claim of the handling
+# re-minting, empty for callers without one), the record's silence class, the
+# record's summary text, and the captured status event (the status log's byte
+# endpoint plus its filesystem identity), never the summary prose alone.
+# Summary equality is a narrowing conjunction, never a sufficient key:
+# structural identity must match too, because one handling may carry several
+# distinct dispositions of one task and prose alone must never decide a
+# collapse. The silence class
 # is structural too: a silent no-op disposition and a visible action
 # disposition remain separate records even inside one handling.
 # Different handlings
@@ -688,11 +688,11 @@ case "$CMD" in
     # status identity, and the matching record unprocessed and, when the
     # re-mint carries no handling token, within OUTCOME_DUPLICATE_WINDOW_SECONDS)
     # prints that record's seq and writes nothing. The collapse goes to stderr
-    # so callers can name it; stdout
-    # keeps carrying only the sequence number. Collapsing into the existing
-    # record preserves its unread and unprocessed lifecycle exactly -
-    # nothing is deleted, nothing new is added, so an unacknowledged record
-    # stays re-ringable and a settled event stays settled.
+    # so callers can name it; stdout keeps carrying only the sequence number.
+    # Collapsing into the existing record preserves its unread and
+    # unprocessed lifecycle exactly - nothing is deleted, nothing new is added,
+    # so an unacknowledged record stays re-ringable and a settled event stays
+    # settled.
     capture_status_position "$TASK"
     DUPLICATE_CANDIDATE=$(duplicate_outcome_seq "$TASK" "$VERDICT" "$WAKE" "$HANDLING" "$SUMMARY")
     if [ -n "$DUPLICATE_CANDIDATE" ]; then
