@@ -1,0 +1,23 @@
+
+$ fm-branch-report.sh --task alpha --verdict routine --summary "worker healthy"   (call #1, one host turn)
+stdout: recorded seq 1 [routine]; the captain has returned, so it is queued for MAIN to relay
+
+$ fm-branch-report.sh --task alpha --verdict routine --summary "worker healthy"   (call #2, one host turn)
+stdout: duplicate re-mint collapsed into the existing seq 1; its relay wake was already queued, so none is queued twice
+stderr: duplicate: outcome re-mint for task alpha collapsed into the existing seq 1
+
+$ fm-branch-report.sh --task alpha --verdict routine --summary "worker healthy"   (call #3, one host turn)
+stdout: duplicate re-mint collapsed into the existing seq 1; its relay wake was already queued, so none is queued twice
+stderr: duplicate: outcome re-mint for task alpha collapsed into the existing seq 1
+
+--- state after the three-call burst ---
+store rows ((temp fixture home)/state/branch-outcomes.jsonl must hold exactly one record):
+{"seq":1,"epoch":1791447662,"task":"alpha","wake":"signal: alpha.status","verdict":"routine","summary":"worker healthy","silent":false,"statusEndpoint":0,"statusIdent":"-","handling":"4451"}
+per-turn receipts ((temp fixture home)/state/.supervision-host-receipts must hold exactly one line):
+t1	1	routine	alpha
+relay wakes queued for MAIN (must hold exactly one supervision-host-return wake):
+relay wake count: 1
+
+--- host consumers stay healthy ---
+$ fm-branch-outcome.sh lookup --seqs "1"  ->  {"seq":1,"epoch":1791447662,"task":"alpha","wake":"signal: alpha.status","verdict":"routine","summary":"worker healthy","silent":false,"statusEndpoint":0,"statusIdent":"-","handling":"4451"}
+(the close-side lookup succeeds on the deduped receipt seqs)
