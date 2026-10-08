@@ -42,10 +42,14 @@
 #     keeps fresh fleet events separate - each newly claimed wake row is
 #     a new handling, so one handling's re-mint flurry (the observed duplicate
 #     bursts) folds up while the next genuinely claimed row records normally,
-#     even when its wake line repeats over an unchanged status log. The window
-#     mainly bounds the token-less residual (unscoped fleet reviews and
-#     caller-less appends), deliberately far below the watcher's repeat
-#     cadence. The silence class is structural, never prose: a silent fleet
+#     even when its wake line repeats over an unchanged status log. A re-mint
+#     naming a non-empty handling token is one handling's own repeat of one
+#     fleet event, not a later event, so it keeps collapsing into its one
+#     record for the whole life of that record's unprocessed span, however
+#     long the one prompt carrying it runs. The window bounds only the
+#     token-less residual (unscoped fleet reviews and caller-less appends),
+#     deliberately far below the watcher's repeat cadence. The silence class
+#     is structural, never prose: a silent fleet
 #     no-op and a visible fleet action remain separate records even inside one
 #     handling. Legacy rows without handling normalize to the empty token "",
 #     and without status provenance to the empty capture (endpoint 0, ident
@@ -125,7 +129,10 @@
 #     Append one outcome record; prints the assigned seq, or the existing
 #     record's seq when the re-mint dedup collapsed the append (with a
 #     "duplicate:" line on stderr). `--handling` carries the handling's
-#     wake-row claim token, recording as the empty token when omitted.
+#     wake-row claim token, recording as the empty token when omitted; a
+#     token carrying a tab, a newline, or more than 512 codepoints is refused
+#     - the bounds the store's own row validator enforces, so the append
+#     seam can never write a row the reader would reject.
 #   fm-branch-outcome.sh unread
 #     Print every unread record (raw JSONL). Exit 0 with no output when none.
 #   fm-branch-outcome.sh mark-read --through <seq>
@@ -202,10 +209,12 @@ OUTCOME_TAIL_ROWS=200
 OUTCOME_TAIL_MAX_BYTES=1048576
 # A re-mint of one already-recorded event collapses into that record instead of
 # appending a second (see the "Re-mint dedup" contract in the header). The
-# window bounds the collapse to one handling's re-mint flurry, which observed
-# bursts span in seconds, while a later fleet event that arrives with the same
-# wake text over an unchanged status log is a separate event and must record;
-# repeats of that shape are observed an hour apart, so the default stays far
+# window bounds only the token-less residual of that collapse: a re-mint
+# naming a non-empty handling token keeps collapsing into its one record for
+# the whole life of that record's unprocessed span, while a later token-less
+# event that arrives with the same wake text over an unchanged status log is a
+# separate event and must record; repeats of that shape are observed an hour
+# apart, so the default stays far
 # below them. FM_OUTCOME_DUPLICATE_WINDOW lets a test use a small window
 # without sleeping.
 OUTCOME_DUPLICATE_WINDOW_SECONDS=${FM_OUTCOME_DUPLICATE_WINDOW:-120}
@@ -357,7 +366,8 @@ capture_status_position() { # <task>
 
 # The re-mint guard behind the append dedup (header "Re-mint dedup"): print the
 # newest stored outcome sequence whose event identity matches the candidate
-# exactly, whose record is still unprocessed, and whose record is still within
+# exactly, whose record is still unprocessed, and whose record is - when
+# the re-mint carries no handling token - still within
 # OUTCOME_DUPLICATE_WINDOW_SECONDS, or print nothing
 # when this is a new event. Identity is structural: task,
 # verdict, the wake line the reporter names, the handling token the caller
@@ -373,7 +383,7 @@ capture_status_position() { # <task>
 # Different handlings
 # of one task are different fleet events - one handling's re-mint flurry (the
 # observed duplicate bursts) collapses, while a freshly claimed wake row that
-# merely reuses a wake line records - so the window mainly bounds the
+# merely reuses a wake line records - so the window bounds only the
 # token-less residual. The base is the still-unprocessed portion of the store
 # (read_processed owns the marker): a record main fully acknowledged is
 # main's settled history, and a repeat report has nothing outstanding to
@@ -404,7 +414,7 @@ duplicate_outcome_seq() { # <task> <verdict> <wake> <handling> <summary>
     [ .[] | select(
         .task == $task and .verdict == $verdict and .wake == $wake
         and (.summary == $summary)
-        and (.epoch >= $cutoff)
+        and ( $handling != "" or .epoch >= $cutoff )
         and ((.handling // "") == $handling)
         and ((.silent // false) == $silent)
         and ((.statusEndpoint // 0) == $endpoint)
@@ -648,6 +658,20 @@ case "$CMD" in
       echo "error: silent outcomes must have the routine verdict" >&2
       exit 2
     fi
+    if [ -n "$HANDLING" ]; then
+      case "$HANDLING" in
+        *$'\t'*|*$'\n'*)
+          echo "error: refusing append because the handling token contains a tab or newline" >&2
+          exit 2
+          ;;
+      esac
+      HANDLING_LEN=$(printf '%s' "$HANDLING" | jq -Rr 'length' 2>/dev/null)
+      case "$HANDLING_LEN" in ''|*[!0-9]*) HANDLING_LEN=513 ;; esac
+      if [ "$HANDLING_LEN" -gt 512 ]; then
+        echo "error: refusing append because the handling token exceeds the 512-codepoint bound" >&2
+        exit 2
+      fi
+    fi
     fm_lock_acquire_wait "$LOCK"
     if ! LAST_SEQ=$(last_seq); then
       fm_lock_release "$LOCK"
@@ -661,9 +685,10 @@ case "$CMD" in
     fi
     # Dedup before the record is written: a re-mint of an event this store
     # still holds in flight (same task, verdict, wake, handling token, and
-    # status identity, and the matching record unprocessed and within
-    # OUTCOME_DUPLICATE_WINDOW_SECONDS) prints that record's seq and writes
-    # nothing. The collapse goes to stderr so callers can name it; stdout
+    # status identity, and the matching record unprocessed and, when the
+    # re-mint carries no handling token, within OUTCOME_DUPLICATE_WINDOW_SECONDS)
+    # prints that record's seq and writes nothing. The collapse goes to stderr
+    # so callers can name it; stdout
     # keeps carrying only the sequence number. Collapsing into the existing
     # record preserves its unread and unprocessed lifecycle exactly -
     # nothing is deleted, nothing new is added, so an unacknowledged record

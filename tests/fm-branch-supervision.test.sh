@@ -295,6 +295,87 @@ test_outcome_remint_collapse_keeps_separate_events_separate() {
   pass "re-mint collapse keeps separate events separate: new wake lines, changed status, expired windows, and legacy rows"
 }
 
+test_outcome_remint_window_binds_only_tokenless_remints() {
+  local home store out seq
+  home="$TMP_ROOT/remint-window-home"
+  mkdir -p "$home/state"
+  store="$home/state/branch-outcomes.jsonl"
+  printf 'working: setup line\n' > "$home/state/window-task.status"
+
+  seq=$(FM_HOME="$home" "$ROOT/bin/fm-branch-outcome.sh" append \
+    --task window-task --verdict routine --summary 'handled the signal' --wake 'signal: window-task.status') \
+    || fail "tokenless append failed"
+  [ "$seq" = 1 ] || fail "tokenless outcome seq was $seq, not 1"
+
+  seq=$(FM_HOME="$home" "$ROOT/bin/fm-branch-outcome.sh" append \
+    --task window-task --verdict routine --summary 'handled the signal' --wake 'signal: window-task.status' --handling '4451') \
+    || fail "claimed-handling append failed"
+  [ "$seq" = 2 ] || fail "a freshly claimed handling collapsed onto the tokenless record: $seq"
+
+  # One handling is one fleet event: its re-mints keep collapsing for the
+  # whole span that record stays unprocessed, past the window that bounds
+  # only the token-less residual. A one-second window plus a two-second gap
+  # proves the window term is not what carried the collapse.
+  sleep 2
+  out=$(FM_OUTCOME_DUPLICATE_WINDOW=1 FM_HOME="$home" "$ROOT/bin/fm-branch-outcome.sh" append \
+    --task window-task --verdict routine --summary 'handled the signal' --wake 'signal: window-task.status' --handling '4451' \
+    2>"$TMP_ROOT/remint-window.stderr") \
+    || fail "a token-carrying re-mint past the window failed"
+  [ "$out" = 2 ] \
+    || fail "a token-carrying re-mint past the window minted a second record: $out"
+  assert_contains "$(cat "$TMP_ROOT/remint-window.stderr")" "collapsed into the existing seq 2" \
+    "a token-carrying re-mint past the window lost its collapse note"
+  [ "$(awk 'END { print NR }' "$store")" = 2 ] \
+    || fail "a token-carrying re-mint past the window appended a second record"
+
+  # The window stays the residual bound for token-less re-mints: past it the
+  # same identity over the unchanged status log records as a later event.
+  seq=$(FM_OUTCOME_DUPLICATE_WINDOW=1 FM_HOME="$home" "$ROOT/bin/fm-branch-outcome.sh" append \
+    --task window-task --verdict routine --summary 'handled the signal' --wake 'signal: window-task.status') \
+    || fail "tokenless append past the window failed"
+  [ "$seq" = 3 ] \
+    || fail "the window stopped bounding the token-less residual: $seq"
+  [ "$(awk 'END { print NR }' "$store")" = 3 ] \
+    || fail "the post-window tokenless append did not grow the store to 3 rows"
+  pass "the duplicate window bounds only token-less re-mints; one handling collapses for its whole unprocessed span"
+}
+
+test_outcome_append_rejects_a_poisoning_handling_token() {
+  local home store out rc seq long
+  home="$TMP_ROOT/poison-handling-home"
+  mkdir -p "$home/state"
+  store="$home/state/branch-outcomes.jsonl"
+  long=$(printf '%0.sx' $(seq 600))
+
+  out=$(FM_HOME="$home" "$ROOT/bin/fm-branch-outcome.sh" append \
+    --task poison-task --verdict routine --summary 'handled the signal' --handling "$(printf 'a\tb')" 2>&1); rc=$?
+  [ "$rc" -eq 2 ] || fail "a tab-carrying handling token was accepted: rc=$rc $out"
+  [ ! -e "$store" ] || fail "a refused handling token still wrote a store row"
+
+  out=$(FM_HOME="$home" "$ROOT/bin/fm-branch-outcome.sh" append \
+    --task poison-task --verdict routine --summary 'handled the signal' --handling "$(printf 'a\nb')" 2>&1); rc=$?
+  [ "$rc" -eq 2 ] || fail "a newline-carrying handling token was accepted: rc=$rc $out"
+  [ ! -e "$store" ] || fail "a refused handling token still wrote a store row"
+
+  out=$(FM_HOME="$home" "$ROOT/bin/fm-branch-outcome.sh" append \
+    --task poison-task --verdict routine --summary 'handled the signal' --handling "$long" 2>&1); rc=$?
+  [ "$rc" -eq 2 ] || fail "an over-long handling token was accepted: rc=$rc $out"
+  assert_contains "$out" "512-codepoint" \
+    "an over-long handling token refusal must name the bound"
+  [ ! -e "$store" ] || fail "a refused handling token still wrote a store row"
+
+  # The boundary stays open: a valid handling token records, and the store
+  # stays readable afterwards.
+  seq=$(FM_HOME="$home" "$ROOT/bin/fm-branch-outcome.sh" append \
+    --task poison-task --verdict routine --summary 'handled the signal' --handling '4451,4452') \
+    || fail "the tightening append seam refused a valid handling token"
+  [ "$seq" = 1 ] || fail "a valid handling token did not record as seq 1: $seq"
+  out=$(FM_HOME="$home" "$ROOT/bin/fm-branch-outcome.sh" unread) || fail "the store stopped reading back after the refusal round"
+  assert_contains "$out" '"handling":"4451,4452"' \
+    "the valid handling token did not reach the readable store row"
+  pass "append rejects handling tokens that would brick the store's own validator, while valid tokens keep recording"
+}
+
 test_outcome_append_keeps_a_bounded_display_tail() {
   local home store tail cursor
   home="$TMP_ROOT/tail-home"
@@ -1700,6 +1781,8 @@ test_branch_prompt_is_byte_stable_and_above_cache_floor
 test_outcome_store_is_append_only_with_cursor_reads
 test_outcome_append_collapses_a_remint_of_one_recorded_event
 test_outcome_remint_collapse_keeps_separate_events_separate
+test_outcome_remint_window_binds_only_tokenless_remints
+test_outcome_append_rejects_a_poisoning_handling_token
 test_outcome_append_keeps_a_bounded_display_tail
 test_outcome_tail_keeps_whole_newest_rows_within_its_byte_budget
 test_outcome_seed_tail_creates_only_an_absent_display_tail

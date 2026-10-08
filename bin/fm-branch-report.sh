@@ -8,10 +8,10 @@
 # requires before it counts a wake handled. A re-mint of an event the store
 # still holds in flight collapses into that existing record under the store's
 # own conjunctive identity and window (the turn's claimed wake rows ride
-# along as the handling token): the duplicate report still leaves its
-# per-turn receipt, but no second record is stored (stderr keeps the store's
-# "duplicate:" note) and no second relay wake is queued for it. A repeat
-# whose predecessor the store fully acknowledged has nothing outstanding to
+# along as the handling token): the duplicate report adds no second store
+# record (stderr keeps the store's "duplicate:" note), no second per-turn
+# receipt line for a seq its turn already receipted, and no second relay
+# wake. A repeat whose predecessor the store fully acknowledged has nothing outstanding to
 # re-mint and records fresh, as the store's own contract owns. It enforces the same scoping the
 # Pi tool does (docs/pi-supervision-branch.md "Components and their owners"):
 # while the host's current turn claims signal or stale rows, only the tasks
@@ -149,10 +149,15 @@ if grep -q '^duplicate:' "$APPEND_STDERR"; then
   grep '^duplicate:' "$APPEND_STDERR" >&2
 fi
 rm -f -- "$APPEND_STDERR"
-printf '%s\t%s\t%s\t%s\n' "$TURN" "$SEQ" "$VERDICT" "$TASK" >> "$RECEIPTS" || {
-  echo "recorded seq $SEQ, but the host receipt could not be written; the host will hand this wake to MAIN" >&2
-  exit 1
-}
+if [ "$DUPLICATE_COLLAPSED" != true ] \
+  || ! awk -F '\t' -v turn="$TURN" -v seq="$SEQ" \
+      '$1 == turn && $2 == seq { found = 1 } END { exit !found }' \
+      "$RECEIPTS" 2>/dev/null; then
+  printf '%s\t%s\t%s\t%s\n' "$TURN" "$SEQ" "$VERDICT" "$TASK" >> "$RECEIPTS" || {
+    echo "recorded seq $SEQ, but the host receipt could not be written; the host will hand this wake to MAIN" >&2
+    exit 1
+  }
+fi
 if [ "$SILENT" = true ]; then
   printf 'recorded seq %s [routine]; silent outcome remains in the outcome store\n' "$SEQ"
   exit 0
