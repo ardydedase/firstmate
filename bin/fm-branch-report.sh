@@ -144,11 +144,9 @@ if ! SEQ=$("$SCRIPT_DIR/fm-branch-outcome.sh" "$@" 2>"$APPEND_STDERR"); then
   echo "outcome store append failed (nothing recorded)" >&2
   exit 1
 fi
+cat "$APPEND_STDERR" >&2
 DUPLICATE_COLLAPSED=false
-if grep -q '^duplicate:' "$APPEND_STDERR"; then
-  DUPLICATE_COLLAPSED=true
-  grep '^duplicate:' "$APPEND_STDERR" >&2
-fi
+grep -q '^duplicate:' "$APPEND_STDERR" && DUPLICATE_COLLAPSED=true
 rm -f -- "$APPEND_STDERR"
 if [ "$DUPLICATE_COLLAPSED" != true ] \
   || ! awk -F '\t' -v turn="$TURN" -v seq="$SEQ" \

@@ -12,8 +12,9 @@
 #     row must have verdict `routine`; the branch prompt and delivery consumers
 #     own the additional no-change eligibility rule. `handling` is the
 #     reporter's wake-row claim token: the wake queue rows the handling that
-#     recorded this outcome claimed (comma-separated seqs from the Pi branch's
-#     eligible-row snapshot or the supervision host's turn record), empty for
+#     recorded this outcome claimed (the comma-joined seqs of the Pi branch's
+#     eligible-row snapshot, or the space-joined seqs of the supervision host's
+#     turn record), empty for
 #     a caller with no claim. It is the dedup identity of one handling -
 #     different handlings are different fleet events - and nothing else:
 #     consumers must never read it as a task list, a proof, or a cursor.

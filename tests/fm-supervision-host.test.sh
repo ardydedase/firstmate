@@ -540,6 +540,40 @@ test_report_collapse_wording_stays_truthful_in_every_exit() {
   pass "report surface: every exit names its collapse, never claiming a fresh record"
 }
 
+# A stored outcome whose display tail copy cannot refresh must still surface the
+# store's warning on the branch shell: the capture that feeds collapse
+# detection forwards every diagnostic, never swallowing the non-duplicate ones.
+test_report_forwards_non_duplicate_store_diagnostics() {
+  local home state fakebin out rc err
+  home="$TMP_ROOT/report-tail-warning"
+  state="$home/state"
+  mkdir -p "$state" "$home/fakebin"
+  printf 'turn=t1\nrows=4451\ntasks=alpha\nunscoped=0\nwake=signal: alpha.status\n' > "$state/.supervision-host-turn"
+
+  # A failing display-tail refresh is the store's one successful-append
+  # diagnostic: only its own mv target is refused, so the rest of the report
+  # path runs against the real binaries.
+  cat > "$home/fakebin/mv" <<'SH'
+#!/usr/bin/env bash
+case "${!#}" in
+  *branch-outcomes-tail.jsonl) exit 1 ;;
+esac
+exec /usr/bin/mv "$@"
+SH
+  chmod +x "$home/fakebin/mv"
+
+  err="$TMP_ROOT/report-tail-warning.err"
+  out=$(FM_HOME="$home" PATH="$home/fakebin:$PATH" FM_SUPERVISION_ACTOR=branch FM_BRANCH_REPORT_TURN=t1 \
+    "$REPORT" --task alpha --verdict routine --summary 'worker healthy' 2>"$err"); rc=$?
+  expect_code 0 "$rc" "an outcome stored without its display tail copy must still record"
+  assert_contains "$out" "recorded seq 1 [routine]" \
+    "the tail copy failure must not change the stdout contract"
+  assert_contains "$(cat "$err")" \
+    "warning: outcome 1 was stored but its display tail copy could not be refreshed" \
+    "the report surface must forward the store's non-duplicate diagnostics"
+  pass "report surface: report stderr forwards the store's warnings, not only its collapse notes"
+}
+
 # --- dispatch entry -----------------------------------------------------------
 
 test_dispatch_entry_scopes_rows_and_renders_the_away_tail() {
@@ -3116,6 +3150,7 @@ test_report_surface_enforces_actor_turn_and_scope
 test_report_after_the_return_is_queued_for_main
 test_report_collapse_keeps_one_record_receipt_and_relay
 test_report_collapse_wording_stays_truthful_in_every_exit
+test_report_forwards_non_duplicate_store_diagnostics
 test_dispatch_entry_scopes_rows_and_renders_the_away_tail
 test_branch_outcomes_only_on_a_host_home_off_pi
 test_branch_outcomes_put_captain_first_and_collapse_routine_overflow
