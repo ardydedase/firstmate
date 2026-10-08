@@ -458,6 +458,88 @@ test_report_collapse_keeps_one_record_receipt_and_relay() {
   pass "report surface: one event keeps one store row, one per-turn receipt line, and one relay wake across a re-mint burst"
 }
 
+# A collapsed append must never claim it recorded: every exit names the
+# collapse and the existing seq on stdout, whatever posture the turn ran in.
+test_report_collapse_wording_stays_truthful_in_every_exit() {
+  local home state out rc err
+
+  # The silent exit serves any posture: the collapsed duplicate keeps its
+  # durability note without claiming a fresh record.
+  home="$TMP_ROOT/report-remint-silent"
+  state="$home/state"
+  mkdir -p "$state"
+  printf 'turn=t1\nrows=4451\ntasks=alpha\nunscoped=0\nwake=signal: alpha.status\n' > "$state/.supervision-host-turn"
+  out=$(FM_HOME="$home" FM_SUPERVISION_ACTOR=branch FM_BRANCH_REPORT_TURN=t1 "$REPORT" \
+    --task alpha --verdict routine --summary 'worker healthy' --silent true 2>/dev/null); rc=$?
+  expect_code 0 "$rc" "the silent fixture's first report must be recorded"
+  assert_contains "$out" "recorded seq 1 [routine]; silent outcome remains in the outcome store" \
+    "fixture setup: the first silent report must record"
+  out=$(FM_HOME="$home" FM_SUPERVISION_ACTOR=branch FM_BRANCH_REPORT_TURN=t1 "$REPORT" \
+    --task alpha --verdict routine --summary 'worker healthy' --silent true 2>/dev/null); rc=$?
+  expect_code 0 "$rc" "the collapsed silent duplicate must still exit 0"
+  assert_contains "$out" "duplicate re-mint collapsed into the existing seq 1; the silent outcome remains in the outcome store" \
+    "the silent exit must name its collapse and keep the durability note"
+  assert_not_contains "$out" "recorded seq" "the silent duplicate claimed a fresh record: $out"
+  [ "$(awk 'END { print NR }' "$state/branch-outcomes.jsonl")" = 1 ] \
+    || fail "the silent duplicate appended a second store row"
+
+  # The attended exits serve a present captain: both verdict classes name
+  # the collapse while keeping their own non-duplicate reach notes.
+  home="$TMP_ROOT/report-remint-attended"
+  state="$home/state"
+  mkdir -p "$state"
+  printf 'turn=t1\nrows=4451\ntasks=alpha\nunscoped=0\nwake=signal: alpha.status\nposture=attended\n' > "$state/.supervision-host-turn"
+  out=$(FM_HOME="$home" FM_SUPERVISION_ACTOR=branch FM_BRANCH_REPORT_TURN=t1 "$REPORT" \
+    --task alpha --verdict captain --summary 'PR ready' 2>/dev/null); rc=$?
+  expect_code 0 "$rc" "the attended fixture's first captain report must be recorded"
+  assert_contains "$out" "recorded seq 1 [captain]; MAIN processes it from its next drain" \
+    "fixture setup: the first attended captain report must record"
+  out=$(FM_HOME="$home" FM_SUPERVISION_ACTOR=branch FM_BRANCH_REPORT_TURN=t1 "$REPORT" \
+    --task alpha --verdict captain --summary 'PR ready' 2>/dev/null); rc=$?
+  expect_code 0 "$rc" "the collapsed attended captain duplicate must still exit 0"
+  assert_contains "$out" "duplicate re-mint collapsed into the existing seq 1 [captain]; MAIN processes the existing outcome from its next drain" \
+    "the attended captain exit must name its collapse and the drain path"
+  assert_not_contains "$out" "recorded seq" "the attended captain duplicate claimed a fresh record: $out"
+  out=$(FM_HOME="$home" FM_SUPERVISION_ACTOR=branch FM_BRANCH_REPORT_TURN=t1 "$REPORT" \
+    --task alpha --verdict routine --summary 'worker healthy' 2>/dev/null); rc=$?
+  expect_code 0 "$rc" "the attended fixture's first routine report must be recorded"
+  assert_contains "$out" "recorded seq 2 [routine]; it waits in the outcome store for MAIN" \
+    "fixture setup: the first attended routine report must record"
+  out=$(FM_HOME="$home" FM_SUPERVISION_ACTOR=branch FM_BRANCH_REPORT_TURN=t1 "$REPORT" \
+    --task alpha --verdict routine --summary 'worker healthy' 2>/dev/null); rc=$?
+  expect_code 0 "$rc" "the collapsed attended routine duplicate must still exit 0"
+  assert_contains "$out" "duplicate re-mint collapsed into the existing seq 2 [routine]; it already waits in the outcome store for MAIN" \
+    "the attended routine exit must name its collapse and its store wait"
+  assert_not_contains "$out" "recorded seq" "the attended routine duplicate claimed a fresh record: $out"
+  [ "$(awk 'END { print NR }' "$state/branch-outcomes.jsonl")" = 2 ] \
+    || fail "the attended duplicates appended extra store rows"
+
+  # The away-window exit serves a genuine away turn: a re-issue during the
+  # same prompt is the primary burst context and must not claim a record.
+  home="$TMP_ROOT/report-remint-away"
+  state="$home/state"
+  mkdir -p "$state"
+  FM_HOME="$home" "$CONTRACT" enter --words 'watch the fleet' >/dev/null 2>&1 \
+    || fail "fixture: could not record the away posture"
+  printf 'turn=t1\nrows=4451\ntasks=alpha\nunscoped=0\nwake=signal: alpha.status\n' > "$state/.supervision-host-turn"
+  out=$(FM_HOME="$home" FM_SUPERVISION_ACTOR=branch FM_BRANCH_REPORT_TURN=t1 "$REPORT" \
+    --task alpha --verdict captain --summary 'PR ready' 2>/dev/null); rc=$?
+  expect_code 0 "$rc" "the away fixture's first report must be recorded"
+  assert_contains "$out" "recorded seq 1 [captain]; it waits in the outcome store for MAIN" \
+    "fixture setup: the first away-window report must record"
+  out=$(FM_HOME="$home" FM_SUPERVISION_ACTOR=branch FM_BRANCH_REPORT_TURN=t1 "$REPORT" \
+    --task alpha --verdict captain --summary 'PR ready' 2>/dev/null); rc=$?
+  expect_code 0 "$rc" "the collapsed away-window duplicate must still exit 0"
+  assert_contains "$out" "duplicate re-mint collapsed into the existing seq 1 [captain]; it already waits in the outcome store for MAIN" \
+    "the away-window exit must name its collapse and its store wait"
+  assert_not_contains "$out" "recorded seq" "the away-window duplicate claimed a fresh record: $out"
+  ! grep -qs 'supervision-host-return' "$state/.wake-queue" \
+    || fail "the away-window duplicate queued a relay wake"
+  [ "$(awk 'END { print NR }' "$state/branch-outcomes.jsonl")" = 1 ] \
+    || fail "the away-window duplicate appended a second store row"
+  pass "report surface: every exit names its collapse, never claiming a fresh record"
+}
+
 # --- dispatch entry -----------------------------------------------------------
 
 test_dispatch_entry_scopes_rows_and_renders_the_away_tail() {
@@ -3033,6 +3115,7 @@ test_park_exit_probe_uses_half_second_child_sleeps
 test_report_surface_enforces_actor_turn_and_scope
 test_report_after_the_return_is_queued_for_main
 test_report_collapse_keeps_one_record_receipt_and_relay
+test_report_collapse_wording_stays_truthful_in_every_exit
 test_dispatch_entry_scopes_rows_and_renders_the_away_tail
 test_branch_outcomes_only_on_a_host_home_off_pi
 test_branch_outcomes_put_captain_first_and_collapse_routine_overflow

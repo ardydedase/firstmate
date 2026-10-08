@@ -9,9 +9,10 @@
 # still holds in flight collapses into that existing record under the store's
 # own conjunctive identity and window (the turn's claimed wake rows ride
 # along as the handling token): the duplicate report adds no second store
-# record (stderr keeps the store's "duplicate:" note), no second per-turn
-# receipt line for a seq its turn already receipted, and no second relay
-# wake. A repeat whose predecessor the store fully acknowledged has nothing outstanding to
+# record (stderr keeps the store's "duplicate:" note), says so on stdout -
+# naming the collapse and the existing seq, never claiming a fresh record -
+# writes no second per-turn receipt line for a seq its turn already
+# receipted, and queues no second relay wake. A repeat whose predecessor the store fully acknowledged has nothing outstanding to
 # re-mint and records fresh, as the store's own contract owns. It enforces the same scoping the
 # Pi tool does (docs/pi-supervision-branch.md "Components and their owners"):
 # while the host's current turn claims signal or stale rows, only the tasks
@@ -159,14 +160,26 @@ if [ "$DUPLICATE_COLLAPSED" != true ] \
   }
 fi
 if [ "$SILENT" = true ]; then
-  printf 'recorded seq %s [routine]; silent outcome remains in the outcome store\n' "$SEQ"
+  if [ "$DUPLICATE_COLLAPSED" = true ]; then
+    printf 'duplicate re-mint collapsed into the existing seq %s; the silent outcome remains in the outcome store\n' "$SEQ"
+  else
+    printf 'recorded seq %s [routine]; silent outcome remains in the outcome store\n' "$SEQ"
+  fi
   exit 0
 fi
 if [ "$(turn_field posture)" = attended ]; then
   if [ "$VERDICT" = captain ] && ! fm_afk_contract_away_present "$STATE"; then
-    printf 'recorded seq %s [captain]; MAIN processes it from its next drain\n' "$SEQ"
+    if [ "$DUPLICATE_COLLAPSED" = true ]; then
+      printf 'duplicate re-mint collapsed into the existing seq %s [captain]; MAIN processes the existing outcome from its next drain\n' "$SEQ"
+    else
+      printf 'recorded seq %s [captain]; MAIN processes it from its next drain\n' "$SEQ"
+    fi
   else
-    printf 'recorded seq %s [%s]; it waits in the outcome store for MAIN\n' "$SEQ" "$VERDICT"
+    if [ "$DUPLICATE_COLLAPSED" = true ]; then
+      printf 'duplicate re-mint collapsed into the existing seq %s [%s]; it already waits in the outcome store for MAIN\n' "$SEQ" "$VERDICT"
+    else
+      printf 'recorded seq %s [%s]; it waits in the outcome store for MAIN\n' "$SEQ" "$VERDICT"
+    fi
   fi
   exit 0
 fi
@@ -183,6 +196,10 @@ if ! fm_afk_contract_away_present "$STATE"; then
     exit 0
   fi
   printf 'recorded seq %s [%s]; the captain has returned, so it is queued for MAIN to relay\n' "$SEQ" "$VERDICT"
+  exit 0
+fi
+if [ "$DUPLICATE_COLLAPSED" = true ]; then
+  printf 'duplicate re-mint collapsed into the existing seq %s [%s]; it already waits in the outcome store for MAIN\n' "$SEQ" "$VERDICT"
   exit 0
 fi
 printf 'recorded seq %s [%s]; it waits in the outcome store for MAIN\n' "$SEQ" "$VERDICT"
