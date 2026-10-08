@@ -1,0 +1,9 @@
+fm-test-run.sh transcript excerpt of the new herdr reclaim regression tests (five)
+Branch: ardy/fm-relaunch-missing-window-gap @ 2ef046b
+Command: bin/fm-test-run.sh tests/fm-control-relaunch.test.sh  (family backend-dispatch; FM_TEST_SUMMARY total=1 failed=0, exit 0)
+
+ok - reclaim: a pane reclaimed under a running server is rebound into a fresh tab in the recorded session
+ok - fm-control exit: a window reclaimed under a running server is reported endpoint-gone, not a refusal
+ok - fm-control relaunch: a window reclaimed under a running server completes the stop-and-rebind transaction whole
+ok - reclaim: a stale presentation journal neither blocks nor is corrupted by the flat rebind of a reclaimed window
+ok - reclaim: an unattributable agent under a running server refuses both verbs, so two agents cannot share an endpoint

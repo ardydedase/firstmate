@@ -1,0 +1,24 @@
+Fail-before-fix check: the #5007 recovery widening surgically disabled (missing herdr endpoint refused
+instead of reclaimed, reproducing the pre-fix revive-gap class), then each new regression test
+run in isolation against that broken production code.
+
+--- recovery tests: FAIL as expected (revive-gap reproduced) ---
+not ok - a pane reclaimed under a running server must be rebound
+error: task rl78's recorded endpoint fmlab:%7 reads 'missing', but the recorded herdr session's server could not be started, or its pane could not be classified once it was running. An endpoint that cannot be proven absent may still hold a live agent on this task's worktree; refusing rather than launching a second agent into it
+pane get %7 --session fmlab
+status --json --session fmlab
+pane get %7 --session fmlab: expected exit 0, got 1
+not ok - an endpoint proven reclaimed while its server runs is agent-free, which exit proves and reports
+error: task rl79's endpoint fmlab:%7 reads 'missing', but the recorded herdr session's server could not be started, or its pane could not be classified once it was running; exit will not claim an agent stopped at an address it cannot trust, nor send lifecycle input to one: expected exit 0, got 1
+
+not ok - the full relaunch transaction must complete over a reclaimed window
+error: task rl80's endpoint fmlab:%7 reads 'missing', but the recorded herdr session's server could not be started, or its pane could not be classified once it was running; exit will not claim an agent stopped at an address it cannot trust, nor send lifecycle input to one
+error: relaunch of rl80 failed while stopping the old agent and its state is 'missing', so it was not proven stopped; its original instructions were restored and the durable record was retained for recovery: expected exit 0, got 1
+
+not ok - a reclaimed window must recover even with its projection journal still present
+error: task rl81's recorded endpoint fmlab:%7 reads 'missing', but the recorded herdr session's server could not be started, or its pane could not be classified once it was running. An endpoint that cannot be proven absent may still hold a live agent on this task's worktree; refusing rather than launching a second agent into it: expected exit 0, got 1
+
+--- safety test: still PASS as intended (refusal class unchanged by the break) ---
+ok - reclaim: an unattributable agent under a running server refuses both verbs, so two agents cannot share an endpoint
+
+After restoring the intact production code, bin/fm-test-run.sh tests/fm-control-relaunch.test.sh is green (82 ok, exit 0).
