@@ -1,0 +1,2 @@
+ok - a backlog sized above argv limits keeps a valid main inventory source
+DONE: argv-limit test passed

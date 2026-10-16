@@ -1,0 +1,3 @@
+/home/ardydedase/.no-mistakes/worktrees/f93ad173517b/01M528N4KTEE9SB8CY7FKHD2Z3/bin/fm-fleet-snapshot.sh: line 943: /home/ardydedase/.local/bin/jq: Argument list too long
+fm-fleet-snapshot: main inventory summary failed
+not ok - fleet snapshot died for a backlog above the per-argument exec limit
