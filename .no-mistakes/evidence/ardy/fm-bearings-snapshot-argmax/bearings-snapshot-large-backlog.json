@@ -1,0 +1,225 @@
+{
+  "schema": "fm-bearings.v1",
+  "home": "fm-bearings.ZLjFTz/large-main-backlog",
+  "generated": "2026-07-11T18:00:00Z",
+  "prs": "not_requested (run: /bearings include PRs)",
+  "contributions": {
+    "scope": "owned contributions per home",
+    "known": 0,
+    "checked": 0,
+    "counts": {
+      "captain": 0,
+      "fleet": 0,
+      "maintainer": 0,
+      "nobody": 0
+    },
+    "complete": true,
+    "proven_clear": true,
+    "unmeasured_homes": 0,
+    "unreadable_records": 0,
+    "unmeasured": 0,
+    "stale_verdicts": 0,
+    "missing_verdicts": 0,
+    "captain_omitted": 0,
+    "captain": []
+  },
+  "in_flight": [],
+  "secondmates": [],
+  "secondmate_reconcile": [],
+  "decisions_open": [],
+  "landed": [],
+  "gates": [
+    {
+      "id": "bulk-001",
+      "title": "Bulk queued work 001 filler filler filler filler filler fill…",
+      "blocked_by": "-",
+      "reason": "-",
+      "owner": "(main)",
+      "filed": null
+    },
+    {
+      "id": "bulk-002",
+      "title": "Bulk queued work 002 filler filler filler filler filler fill…",
+      "blocked_by": "-",
+      "reason": "-",
+      "owner": "(main)",
+      "filed": null
+    },
+    {
+      "id": "bulk-003",
+      "title": "Bulk queued work 003 filler filler filler filler filler fill…",
+      "blocked_by": "-",
+      "reason": "-",
+      "owner": "(main)",
+      "filed": null
+    },
+    {
+      "id": "bulk-004",
+      "title": "Bulk queued work 004 filler filler filler filler filler fill…",
+      "blocked_by": "-",
+      "reason": "-",
+      "owner": "(main)",
+      "filed": null
+    },
+    {
+      "id": "bulk-005",
+      "title": "Bulk queued work 005 filler filler filler filler filler fill…",
+      "blocked_by": "-",
+      "reason": "-",
+      "owner": "(main)",
+      "filed": null
+    },
+    {
+      "id": "bulk-006",
+      "title": "Bulk queued work 006 filler filler filler filler filler fill…",
+      "blocked_by": "-",
+      "reason": "-",
+      "owner": "(main)",
+      "filed": null
+    },
+    {
+      "id": "bulk-007",
+      "title": "Bulk queued work 007 filler filler filler filler filler fill…",
+      "blocked_by": "-",
+      "reason": "-",
+      "owner": "(main)",
+      "filed": null
+    },
+    {
+      "id": "bulk-008",
+      "title": "Bulk queued work 008 filler filler filler filler filler fill…",
+      "blocked_by": "-",
+      "reason": "-",
+      "owner": "(main)",
+      "filed": null
+    },
+    {
+      "id": "bulk-009",
+      "title": "Bulk queued work 009 filler filler filler filler filler fill…",
+      "blocked_by": "-",
+      "reason": "-",
+      "owner": "(main)",
+      "filed": null
+    },
+    {
+      "id": "bulk-010",
+      "title": "Bulk queued work 010 filler filler filler filler filler fill…",
+      "blocked_by": "-",
+      "reason": "-",
+      "owner": "(main)",
+      "filed": null
+    },
+    {
+      "id": "bulk-011",
+      "title": "Bulk queued work 011 filler filler filler filler filler fill…",
+      "blocked_by": "-",
+      "reason": "-",
+      "owner": "(main)",
+      "filed": null
+    },
+    {
+      "id": "bulk-012",
+      "title": "Bulk queued work 012 filler filler filler filler filler fill…",
+      "blocked_by": "-",
+      "reason": "-",
+      "owner": "(main)",
+      "filed": null
+    },
+    {
+      "id": "bulk-013",
+      "title": "Bulk queued work 013 filler filler filler filler filler fill…",
+      "blocked_by": "-",
+      "reason": "-",
+      "owner": "(main)",
+      "filed": null
+    },
+    {
+      "id": "bulk-014",
+      "title": "Bulk queued work 014 filler filler filler filler filler fill…",
+      "blocked_by": "-",
+      "reason": "-",
+      "owner": "(main)",
+      "filed": null
+    },
+    {
+      "id": "bulk-015",
+      "title": "Bulk queued work 015 filler filler filler filler filler fill…",
+      "blocked_by": "-",
+      "reason": "-",
+      "owner": "(main)",
+      "filed": null
+    },
+    {
+      "id": "bulk-016",
+      "title": "Bulk queued work 016 filler filler filler filler filler fill…",
+      "blocked_by": "-",
+      "reason": "-",
+      "owner": "(main)",
+      "filed": null
+    },
+    {
+      "id": "bulk-017",
+      "title": "Bulk queued work 017 filler filler filler filler filler fill…",
+      "blocked_by": "-",
+      "reason": "-",
+      "owner": "(main)",
+      "filed": null
+    },
+    {
+      "id": "bulk-018",
+      "title": "Bulk queued work 018 filler filler filler filler filler fill…",
+      "blocked_by": "-",
+      "reason": "-",
+      "owner": "(main)",
+      "filed": null
+    },
+    {
+      "id": "bulk-019",
+      "title": "Bulk queued work 019 filler filler filler filler filler fill…",
+      "blocked_by": "-",
+      "reason": "-",
+      "owner": "(main)",
+      "filed": null
+    },
+    {
+      "id": "bulk-020",
+      "title": "Bulk queued work 020 filler filler filler filler filler fill…",
+      "blocked_by": "-",
+      "reason": "-",
+      "owner": "(main)",
+      "filed": null
+    }
+  ],
+  "reports": [],
+  "recorded_prs": [],
+  "omitted": [
+    {
+      "surface": "backlog item bodies",
+      "reveal": "--fields bodies"
+    },
+    {
+      "surface": "task paths",
+      "reveal": "--fields paths"
+    },
+    {
+      "surface": "watch/steer actions",
+      "reveal": "--fields actions"
+    },
+    {
+      "surface": "healthy endpoint detail",
+      "reveal": "--fields endpoints"
+    },
+    {
+      "surface": "full scout-report inventory",
+      "reveal": "--all-reports"
+    },
+    {
+      "surface": "gates showing 20 of 120",
+      "reveal": "--all-queued"
+    },
+    {
+      "surface": "live PR discovery + checks",
+      "reveal": "--include-prs"
+    }
+  ]
+}
