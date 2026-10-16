@@ -1,0 +1,8 @@
+# Flake 1 reproduction: base commit (1a6714f) of bin/fm-test-run.sh, --check-coverage
+# under LC_ALL=vi_VN.utf8 (full-collation locale; feeds were sorted with LC_ALL=C
+# sort -u but comm ran bare).
+# Command: git show 1a6714f:bin/fm-test-run.sh > bin/.repro-fm-test-run-base.sh && \
+#          LC_ALL=vi_VN.utf8 bash bin/.repro-fm-test-run-base.sh --check-coverage
+comm: file 2 is not in sorted order
+comm: input is not in sorted order
+EXIT=1

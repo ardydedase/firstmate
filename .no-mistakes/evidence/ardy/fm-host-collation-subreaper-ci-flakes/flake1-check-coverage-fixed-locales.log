@@ -1,0 +1,11 @@
+# Fixed bin/fm-test-run.sh --check-coverage under three locales
+# (vi_VN.utf8 reproduces the original flake; unset and C are the acceptance cases).
+# 1) LC_ALL=vi_VN.utf8 bash bin/fm-test-run.sh --check-coverage
+FM_TEST_COVERAGE ok total=259 parallel=24 parallel_max_ms=665545 parallel_imbalance_ms=2 parallel_unhinted=0 serial=219 serial_shards=9 serial_unhinted=14 serial_max_ms=1074843 serial_budget_ms=1200000 herdr=16
+EXIT=0
+# 2) LC_ALL unset (host default LANG=en_US.UTF-8)
+FM_TEST_COVERAGE ok total=259 parallel=24 parallel_max_ms=665545 parallel_imbalance_ms=2 parallel_unhinted=0 serial=219 serial_shards=9 serial_unhinted=14 serial_max_ms=1074843 serial_budget_ms=1200000 herdr=16
+EXIT=0
+# 3) LC_ALL=C
+FM_TEST_COVERAGE ok total=259 parallel=24 parallel_max_ms=665545 parallel_imbalance_ms=2 parallel_unhinted=0 serial=219 serial_shards=9 serial_unhinted=14 serial_max_ms=1074843 serial_budget_ms=1200000 herdr=16
+EXIT=0
