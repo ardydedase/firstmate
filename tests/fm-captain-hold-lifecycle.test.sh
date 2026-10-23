@@ -1266,11 +1266,13 @@ test_visual_review_uses_shared_completion_owner() {
 }
 
 test_complete_keeps_pr_identity_tail_parseable() {
-  local home id meta
+  local home id meta device
   home=$(make_home complete-pr-tail)
   id=sample-merge-watch
   mkdir -p "$home/data/$id"
   meta="$home/state/$id.meta"
+  device=$(fm_pr_file_device "$home/state") \
+    || fail "could not resolve the fixture state device"
   fm_write_meta "$meta" \
     "window=firstmate:fm-$id" \
     "worktree=$home/projects/missing-$id" \
@@ -1281,6 +1283,8 @@ test_complete_keeps_pr_identity_tail_parseable() {
     "spawn_gen=fixture-$id" \
     "pr=https://github.com/example/repo/pull/19" \
     "pr_head=0123456789abcdef0123456789abcdef01234567"
+  chmod 0600 "$meta" \
+    || fail "could not arm the fixture task record the way merge-watch does"
   printf 'done: report complete\n' > "$home/state/$id.status"
   run_captain "$home" complete "$id" --none >/dev/null \
     || fail "completing a PR-bound review failed"
@@ -1294,6 +1298,8 @@ test_complete_keeps_pr_identity_tail_parseable() {
     || fail "the empty reviewed inventory was not recorded exactly once"
   [ "$(tail -n 1 "$meta")" = 'pr_head=0123456789abcdef0123456789abcdef01234567' ] \
     || fail "the attestation reordered the task record's PR identity tail"
+  fm_pr_private_file_valid "$meta" 600 "$device" \
+    || fail "the attestation downgraded the armed task record's 0600 mode"
   run_captain "$home" verify "$id" >/dev/null \
     || fail "the recorded inventory no longer verifies after attestation"
   pass "the completion attestation keeps the task record's PR identity tail parseable"
