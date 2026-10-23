@@ -240,6 +240,9 @@ DATA="${FM_DATA_OVERRIDE:-$FM_HOME/data}"
 # shellcheck source=bin/fm-parent-channel-lib.sh
 # shellcheck disable=SC1091
 . "$SCRIPT_DIR/fm-parent-channel-lib.sh"
+# shellcheck source=bin/fm-pr-lib.sh
+# shellcheck disable=SC1091
+. "$SCRIPT_DIR/fm-pr-lib.sh"
 
 PARENT_HOLD_PUBLISHED=0
 publish_parent_hold() {  # <task-id> <occurrence> <verb> <note>
@@ -255,9 +258,11 @@ publish_parent_hold() {  # <task-id> <occurrence> <verb> <note>
 
 CAPTAIN_META_LOCK=
 CAPTAIN_META_LOCK_HELD=0
+CAPTAIN_META_TMP=
 CAPTAIN_CONTROL_LOCK=
 CAPTAIN_CONTROL_LOCK_HELD=0
 captain_hold_cleanup() {
+  [ -z "$CAPTAIN_META_TMP" ] || rm -f -- "$CAPTAIN_META_TMP" 2>/dev/null || true
   if [ "$CAPTAIN_META_LOCK_HELD" = 1 ]; then
     fm_lock_release "$CAPTAIN_META_LOCK" || true
     CAPTAIN_META_LOCK_HELD=0
@@ -1933,7 +1938,13 @@ EOF
 
   if [ "$has_meta" = 1 ]; then
     if [ "$(meta_value "$meta" decisions_reviewed)" != 1 ] || [ "$previous" != "$keys" ]; then
-      printf 'decisions_reviewed=1\ndecision_keys=%s\n' "$keys" >> "$meta"
+      CAPTAIN_META_TMP="$STATE/.$origin.meta.decisions.${BASHPID:-$$}"
+      if ! printf 'decisions_reviewed=1\ndecision_keys=%s\n' "$keys" |
+        fm_pr_metadata_key_rewrite "$meta" "$CAPTAIN_META_TMP" decisions_reviewed decision_keys ||
+        ! fm_backlog_atomic_transition publish "$CAPTAIN_META_TMP" "$meta" "task record" "$STATE"; then
+        fail "could not record the completed captain-call inventory for $origin${FM_BACKLOG_TRANSITION_ERROR:+ ($FM_BACKLOG_TRANSITION_ERROR)}"
+      fi
+      CAPTAIN_META_TMP=
     fi
     fm_lock_release "$CAPTAIN_META_LOCK"
     CAPTAIN_META_LOCK_HELD=0
