@@ -170,6 +170,14 @@ fm_backend_herdr_cli() {
       ;;
     "api snapshot")
       : > "$FIXTURE_DIR/snapshotted"
+      if [ -e "$FIXTURE_DIR/late-duplicate" ]; then
+        rm -f "$FIXTURE_DIR/late-duplicate"
+        write_v1 fm-task
+      fi
+      if [ -e "$FIXTURE_DIR/late-extra" ]; then
+        rm -f "$FIXTURE_DIR/late-extra"
+        write_v1 probe-extra QyQyQyQyQyQyQyQyQyQyQy0
+      fi
       printf '{"result":{"snapshot":{"focused_workspace_id":"w1","focused_tab_id":"%s","focused_pane_id":"w1:p1","workspaces":' "$(cat "$FIXTURE_DIR/active-tab")"
       fixture_workspaces
       printf ',"tabs":'; fixture_tabs
@@ -282,10 +290,9 @@ reset_fixture; : > "$FIXTURE_DIR/race"; assert_preserved "revalidation race"
 reset_fixture; printf '%s\n' "$TAB" > "$FIXTURE_DIR/active-tab"; assert_preserved "active target"
 reset_fixture; : > "$FIXTURE_DIR/focus-refuse"; assert_preserved "focus refusal"
 
-# Candidate discovery must parse each home-local journal exactly once per
-# cleanup pass however many grammar-matching candidate workspaces exist.
 # Wrapping the journal snapshot backend function counts parses through the
-# public data path without touching its validated semantics.
+# public data path without touching its validated semantics; installed once
+# for the mutation-guard and discovery parse budgets below.
 eval "$(declare -f fm_backend_herdr_projection_journal_snapshot \
   | sed '1s/^fm_backend_herdr_projection_journal_snapshot/_cleanup_journal_parse_real/')"
 _parse_calls=0
@@ -293,6 +300,59 @@ fm_backend_herdr_projection_journal_snapshot() {
   _parse_calls=$((_parse_calls + 1))
   _cleanup_journal_parse_real "$@"
 }
+
+# A completed close keeps its whole-pass parse budget at one parse per
+# present journal: the index build parses both journals, and the immediate
+# revalidation plus post-closure journal recheck re-read live state by
+# digesting the journal directory once per check and re-parsing only the
+# journals whose bytes changed since the index.
+reset_fixture
+write_v1 probe-idle XyXyXyXyXyXyXyXyXyXyX0
+_parse_calls=0
+fm_herdr_session_cleanup >/dev/null 2>&1
+[ ! -e "$FM_STATE_OVERRIDE/$ID.herdr-presentation" ] \
+  || fail "closed candidate's journal was not retired"
+[ "$(wc -l < "$CLOSE_LOG" | tr -d ' ')" = 1 ] \
+  || fail "guard-budget close did not close exactly once"
+[ -f "$FM_STATE_OVERRIDE/probe-idle.herdr-presentation" ] \
+  || fail "guard-budget close removed an unmatched journal"
+[ "$_parse_calls" = 2 ] \
+  || fail "closing one candidate parsed journals $_parse_calls times instead of once per journal per pass"
+pass "closing one candidate guards via digest without a per-mutation rescan"
+
+# A journal that appears after discovery must still be caught the same way a
+# fresh rescan would: the revalidation guard reconciles the index with the live
+# directory, so a duplicate title appearing mid-pass preserves the candidate.
+reset_fixture
+: > "$FIXTURE_DIR/late-duplicate"
+fm_herdr_session_cleanup >/dev/null 2>&1
+[ -f "$FM_STATE_OVERRIDE/$ID.herdr-presentation" ] \
+  || fail "mid-pass duplicate journal retired the candidate"
+[ -f "$FM_STATE_OVERRIDE/fm-task.herdr-presentation" ] \
+  || fail "mid-pass duplicate journal was itself retired"
+[ ! -s "$CLOSE_LOG" ] \
+  || fail "mid-pass duplicate journal closed the pane"
+pass "guards catch a journal that appears after discovery"
+
+# An unrelated journal that appears after discovery is re-parsed by the guards
+# alone, and a still-unique candidate completes its exact close anyway.
+reset_fixture
+write_v1 probe-idle XyXyXyXyXyXyXyXyXyXyX0
+: > "$FIXTURE_DIR/late-extra"
+_parse_calls=0
+fm_herdr_session_cleanup >/dev/null 2>&1
+[ ! -e "$FM_STATE_OVERRIDE/$ID.herdr-presentation" ] \
+  || fail "mid-pass unrelated journal change preserved a closable candidate"
+[ -f "$FM_STATE_OVERRIDE/probe-extra.herdr-presentation" ] \
+  || fail "mid-pass unrelated journal change retired the wrong journal"
+[ "$(wc -l < "$CLOSE_LOG" | tr -d ' ')" = 1 ] \
+  || fail "mid-pass unrelated journal change did not close exactly once"
+[ "$_parse_calls" = 3 ] \
+  || fail "mid-pass change parsed journals $_parse_calls times instead of exactly the changed journal"
+pass "guards re-parse only the changed journal and still close"
+
+# Candidate discovery must parse each home-local journal exactly once per
+# cleanup pass however many grammar-matching candidate workspaces exist.
 rm -f "${FM_STATE_OVERRIDE:?}"/*herdr-presentation
 write_v1 probe-a ZzZzZzZzZzZzZzZzZzZzA0
 write_v1 probe-b ZzZzZzZzZzZzZzZzZzZzB0
