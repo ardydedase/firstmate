@@ -504,7 +504,7 @@ test_relaunch_preserves_durable_task_metadata() {
 # appending after it; control_relaunch_tx after pr_head= is the exact shape
 # that once broke three live tasks.
 test_relaunch_keeps_pr_identity_tail_parseable_after_rewrites() {
-  local dir out rc meta poisoned staged traceparent
+  local dir out rc meta poisoned staged traceparent device
   dir=$(new_case pr-identity-tail rl51)
   add_ship_task "$dir" rl51 claude
   meta="$dir/home/state/rl51.meta"
@@ -514,6 +514,8 @@ test_relaunch_keeps_pr_identity_tail_parseable_after_rewrites() {
     printf '%s\n' 'pr=https://github.com/example/repo/pull/51'
     printf '%s\n' 'pr_head=0123456789abcdef0123456789abcdef01234567'
   } >> "$meta"
+  chmod 0600 "$meta" \
+    || fail "could not arm the fixture task record the way merge-watch arms it"
   printf '%s\n' "$$" > "$dir/home/state/.lock"
   printf '%s on\n' "$$" > "$dir/home/state/.trace-context-effective"
 
@@ -540,6 +542,10 @@ test_relaunch_keeps_pr_identity_tail_parseable_after_rewrites() {
     || fail "the relaunch rewrite poisoned the PR identity tail"
   [ "$FM_PR_META_URL" = "https://github.com/example/repo/pull/51" ] \
     || fail "the PR identity must survive the relaunch rewrite"
+  device=$(fm_pr_file_device "$dir/home/state") \
+    || fail "the fixture state directory is unavailable"
+  fm_pr_private_file_valid "$meta" 600 "$device" \
+    || fail "the relaunch rewrites published the armed record away from mode 0600"
 
   # Multi-row rewrites take the same road: the helper a tenure handoff uses to
   # rebind its session rows (polytoken_session/port/credential here) drops the
@@ -557,6 +563,8 @@ test_relaunch_keeps_pr_identity_tail_parseable_after_rewrites() {
     || fail "a rewritten single-owner key must appear exactly once"
   [ "$(tail -n 1 "$staged")" = 'pr_head=0123456789abcdef0123456789abcdef01234567' ] \
     || fail "a staged rewrite reordered the identity tail"
+  fm_pr_task_record_stage_private "$staged" "$dir/home/state" \
+    || fail "a staged rewrite refused to stay private at 0600 on its state device"
   pass "fm-control relaunch: relaunch rewrites keep the PR identity tail parseable"
 }
 

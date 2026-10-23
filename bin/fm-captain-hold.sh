@@ -1938,13 +1938,10 @@ EOF
 
   if [ "$has_meta" = 1 ]; then
     if [ "$(meta_value "$meta" decisions_reviewed)" != 1 ] || [ "$previous" != "$keys" ]; then
-      CAPTAIN_META_DEVICE=$(fm_pr_file_device "$STATE") \
-        || fail "could not resolve the task record state device for $origin"
       CAPTAIN_META_TMP="$STATE/.$origin.meta.decisions.${BASHPID:-$$}"
       if ! printf 'decisions_reviewed=1\ndecision_keys=%s\n' "$keys" |
         fm_pr_metadata_key_rewrite "$meta" "$CAPTAIN_META_TMP" decisions_reviewed decision_keys ||
-        ! chmod 0600 "$CAPTAIN_META_TMP" ||
-        ! fm_pr_private_file_valid "$CAPTAIN_META_TMP" 600 "$CAPTAIN_META_DEVICE" ||
+        ! fm_pr_task_record_stage_private "$CAPTAIN_META_TMP" "$STATE" ||
         ! fm_backlog_atomic_transition publish "$CAPTAIN_META_TMP" "$meta" "task record" "$STATE"; then
         fail "could not record the completed captain-call inventory for $origin${FM_BACKLOG_TRANSITION_ERROR:+ ($FM_BACKLOG_TRANSITION_ERROR)}"
       fi

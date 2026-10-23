@@ -5477,6 +5477,7 @@ spawn_record_polytoken_session() {
       echo "polytoken_port=$POLYTOKEN_SESSION_PORT"
       echo "polytoken_credential=$POLYTOKEN_SESSION_CREDENTIAL"
     } | fm_pr_metadata_key_rewrite "$meta" "$SPAWN_META_TMP" polytoken_session polytoken_port polytoken_credential ||
+    ! fm_pr_task_record_stage_private "$SPAWN_META_TMP" "$STATE" ||
     ! fm_backlog_atomic_transition publish "$SPAWN_META_TMP" "$meta" "task record" "$STATE"; then
     status=1
     rm -f "$SPAWN_META_TMP" 2>/dev/null || true
@@ -6767,7 +6768,8 @@ spawn_report_preserved_state() {
 
 if [ "$RELAUNCH" -eq 1 ]; then
   SPAWN_META_PUBLISH_STARTED=1
-  if ! fm_backlog_atomic_transition publish "$SPAWN_META_TMP" "$STATE/$ID.meta" "task record" "$STATE"; then
+  if ! fm_pr_task_record_stage_private "$SPAWN_META_TMP" "$STATE" ||
+    ! fm_backlog_atomic_transition publish "$SPAWN_META_TMP" "$STATE/$ID.meta" "task record" "$STATE"; then
     echo "error: replacement task record for $ID could not be published ($FM_BACKLOG_TRANSITION_ERROR)" >&2
     exit 1
   fi
@@ -7077,6 +7079,7 @@ spawn_record_traceparent() {
   if [ ! -f "$meta" ] || [ ! -w "$meta" ] ||
     ! printf 'traceparent=%s\n' "$SPAWN_TRACEPARENT" |
       fm_pr_metadata_key_rewrite "$meta" "$SPAWN_META_TMP" traceparent ||
+    ! fm_pr_task_record_stage_private "$SPAWN_META_TMP" "$STATE" ||
     ! fm_backlog_atomic_transition publish "$SPAWN_META_TMP" "$meta" "task record" "$STATE"; then
     status=1
     rm -f "$SPAWN_META_TMP" 2>/dev/null || true
