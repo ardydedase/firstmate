@@ -1,0 +1,42 @@
+## scenario 1: live relaunch preserving an armed, healthy PR identity tail
+Fri Oct 23 22:17:12 +07 2026
+--- post-relaunch record (cat -n) ---
+     1	window=firstmate:fm-labd0daf92a317c-worker
+     2	endpoint_task_id=labd0daf92a317c-worker
+     3	worktree=/private/tmp/fmlab.LydRD5/treehouse/.treehouse/notes-5ead3d/1/notes
+     4	project=/private/tmp/fmlab.LydRD5/home/projects/notes
+     5	harness=claude
+     6	approval_mode=auto
+     7	kind=ship
+     8	mode=local-only
+     9	yolo=on
+    10	branch=fm/labd0daf92a317c-worker
+    11	tasktmp=/tmp/fm-labd0daf92a317c-worker
+    12	model=sonnet
+    13	effort=low
+    14	busy_gen=g1792768590.22311.12008
+    15	spawn_gen=s1792768595.12144.13921
+    16	control_relaunch_tx=2433.20261023T151610Z.24849
+    17	pr=https://github.com/labcrew/notes/pull/42
+    18	pr_head=43d9bfd036be0c5d2fe97cdfb6330a9600b5723b
+--- mode ---
+mode=0600
+--- target fm_pr_metadata_identity_parse on the post-relaunch record ---
+PARSE_OK provider=github url=https://github.com/labcrew/notes/pull/42 number=42
+--- tail assertion (last two rows) ---
+pr=https://github.com/labcrew/notes/pull/42
+pr_head=43d9bfd036be0c5d2fe97cdfb6330a9600b5723b
+--- control_relaunch_tx row index vs pr row index ---
+16:control_relaunch_tx=2433.20261023T151610Z.24849
+17:pr=https://github.com/labcrew/notes/pull/42
+--- journal (relaunch phases) ---
+--- worker window backend classification ---
+lab pid=74618 cmd=zsh dead=0
+fm-labd0daf92a317c-worker pid=82133 cmd=2.1.309 dead=0
+main pid=25594 cmd=2.1.309 dead=0
+--- worker pane capture (replacement alive) ---
+                                                                                                                      tmux focus-events off · add 'set -g focus-events on' to ~/.tmux.conf and reattach for focus tracking
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+❯ 
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ⏵⏵ auto mode on (shift+tab to cycle) · esc to interrupt

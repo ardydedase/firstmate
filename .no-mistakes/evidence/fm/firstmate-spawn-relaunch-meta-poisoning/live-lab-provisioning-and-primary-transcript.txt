@@ -1,0 +1,95 @@
+## live-lab provisioning and readiness (fm-live-lab.sh up at target cc138a034236fb0473bc8db5081e28a37ef6fb82)
+Fri Oct 23 22:19:43 +07 2026
+--- up log (full) ---
+lab: /private/tmp/fmlab.LydRD5 (tear down with: bin/fm-live-lab.sh down /private/tmp/fmlab.LydRD5)
+tree: cc138a034236fb0473bc8db5081e28a37ef6fb82 from /Users/adedase/.no-mistakes/worktrees/527df5d885a5/01M5MKRRRWNA3696TXCPGZH038
+spawned labd0daf92a317c-worker harness=claude kind=ship mode=local-only yolo=on window=firstmate:fm-labd0daf92a317c-worker worktree=/private/tmp/fmlab.LydRD5/treehouse/.treehouse/notes-5ead3d/1/notes
+fm-live-lab: cannot record lab process: missing or invalid PID ''
+--- lab record ---
+fm-live-lab v1
+harness=claude
+home=/private/tmp/fmlab.LydRD5/home
+expect_host=no
+host_off=no
+mate=no
+worker=yes
+nonce=d0daf92a317c
+mate_id=labd0daf92a317c-mate
+worker_id=labd0daf92a317c-worker
+gate=/private/tmp/fmlab.LydRD5/home/data/labd0daf92a317c-worker/gate
+pi_trust=6e62ec75a32ebac40422460ca898179c5fba1c8dc32c196ae7f4cbd896148984
+claude_config_dir=
+claude_store=/Users/adedase/.claude.json
+pi_trust_store=/Users/adedase/.pi/agent/trust.json
+treehouse_dir=/Users/adedase/.treehouse
+tmux_dir=/tmp/fml.VjIIno
+launch_pid=74588
+launch_start=Fri Oct 23 22:11:43 2026
+--- lab home checkout commit ---
+cc138a034236fb0473bc8db5081e28a37ef6fb82
+--- primary pane scrollback: probes, both relaunch drives and reports ---
+FM_HOME='/private/tmp/fmlab.LydRD5/home' CLAUDE_CODE_ENABLE_PROMPT_SUGGESTION=false DISABLE_AUTOUPDATER=1 TREEHOUSE_ROOT='/private/tmp/fmlab.LydRD5/treehouse' FM_BACKEND=tmux claude --setting-sources project,local --mode
+l sonnet --effort low --permission-mode auto
+➜  home FM_HOME='/private/tmp/fmlab.LydRD5/home' CLAUDE_CODE_ENABLE_PROMPT_SUGGESTION=false DISABLE_AUTOUPDATER=1 TREEHOUSE_ROOT='/private/tmp/fmlab.LydRD5/treehouse' FM_BACKEND=tmux claude --setting-sources project,loca
+l --model sonnet --effort low --permission-mode auto
+ ▐▛███▛█   Claude Code v2.1.309
+ ▐▛███▛█   Claude Code v2.1.309
+▝▜██████▀  Sonnet 5.5 with low effort · Claude Team
+ ▝▝   ▝▝   /private/tmp/fmlab.LydRD5/home
+
+
+❯ Lab readiness probe from bin/fm-live-lab.sh. Run no tool or command for this message. Reply with only the word LABREADY, a hyphen, and then d0daf92a317c, with no spaces.
+
+⏺ LABREADY-d0daf92a317c
+
+✻ Cooked for 9s · done 10:14 PM
+
+❯ Live-lab validation: relaunch the parked worker labd0daf92a317c-worker through the control plane, exactly as firstmate would.Run this single command in one Bash call from the lab home: bin/fm-control.sh
+  labd0daf92a317c-worker relaunch --note 'live-lab scenario 1: relaunch after PR tail arm'It may take a couple of minutes. Report fm-control's exact final stdout lines and the exit status, then stop. Nothing else.
+
+⏺ Bash(bin/fm-control.sh labd0daf92a317c-worker relaunch --note 'live-lab scenario 1: relaunch after PR tail arm'; echo "EXIT_STATUS=$?")
+  ⎿  NOTICE: wake rows held by the live supervision branch - it presents and acknowledges them; do not drain them from here.
+     relaunched labd0daf92a317c-worker harness=claude from=claude model=sonnet effort=low backend=tmux endpoint=firstmate:fm-labd0daf92a317c-worker worktree=/private/tmp/fmlab.LydRD5/treehouse/.treehouse/notes-5ead3
+     d/1/notes
+     EXIT_STATUS=0
+  ⎿  (timeout 10m)
+  ⎿  Allowed by auto mode classifier
+
+⏺ Captain, the relaunch worked. The command exited with status 0.
+
+  Final stdout lines from fm-control:
+
+  NOTICE: wake rows held by the live supervision branch - it presents and acknowledges them; do not drain them from here.
+  relaunched labd0daf92a317c-worker harness=claude from=claude model=sonnet effort=low backend=tmux endpoint=firstmate:fm-labd0daf92a317c-worker
+  worktree=/private/tmp/fmlab.LydRD5/treehouse/.treehouse/notes-5ead3d/1/notes
+
+✻ Churned for 1m 30s · done 10:17 PM
+
+❯ Second live-lab validation: the record for labd0daf92a317c-worker was corrupted between cycles. Heal it with a relaunch: run in one Bash call: bin/fm-control.sh labd0daf92a317c-worker relaunch --note 'live-lab
+  scenario 2: relaunch to heal poisoned metadata tail' Capture the exit status too. Report the exact final stdout lines and exit status, then stop.
+
+⏺ Bash(bin/fm-control.sh labd0daf92a317c-worker relaunch --note 'live-lab scenario 2: relaunch to heal poisoned metadata tail'; echo "EXIT_STATUS=$?")
+  ⎿  WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+     relaunched labd0daf92a317c-worker harness=claude from=claude model=sonnet effort=low backend=tmux endpoint=firstmate:fm-labd0daf92a317c-worker worktree=/private/tmp/fmlab.LydRD5/treehouse/.treehouse/notes-5ead3
+     d/1/notes
+     EXIT_STATUS=0
+  ⎿  (timeout 10m)
+  ⎿  Allowed by auto mode classifier
+
+⏺ Captain, the relaunch worked. The command exited with status 0.
+
+  Final stdout lines from fm-control:
+
+  WARNING: queued wakes pending - drain them with bin/fm-wake-drain.sh before anything else.
+  relaunched labd0daf92a317c-worker harness=claude from=claude model=sonnet effort=low backend=tmux endpoint=firstmate:fm-labd0daf92a317c-worker
+  worktree=/private/tmp/fmlab.LydRD5/treehouse/.treehouse/notes-5ead3d/1/notes
+
+  I didn't drain the queued wakes, since you asked me to stop after reporting.
+
+✻ Sautéed for 1m 15s · done 10:19 PM
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+❯ 
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ⏵⏵ auto mode on (shift+tab to cycle)
+

@@ -1,0 +1,64 @@
+## scenario 2 heal verification: live relaunch of a poisoned record
+Fri Oct 23 22:19:24 +07 2026
+--- record after the healing relaunch (cat -n) ---
+     1	window=firstmate:fm-labd0daf92a317c-worker
+     2	endpoint_task_id=labd0daf92a317c-worker
+     3	worktree=/private/tmp/fmlab.LydRD5/treehouse/.treehouse/notes-5ead3d/1/notes
+     4	project=/private/tmp/fmlab.LydRD5/home/projects/notes
+     5	harness=claude
+     6	approval_mode=auto
+     7	kind=ship
+     8	mode=local-only
+     9	yolo=on
+    10	branch=fm/labd0daf92a317c-worker
+    11	tasktmp=/tmp/fm-labd0daf92a317c-worker
+    12	model=sonnet
+    13	effort=low
+    14	busy_gen=g1792768716.79172.31228
+    15	spawn_gen=s1792768722.72964.15194
+    16	control_relaunch_tx=66181.20261023T151822Z.30329
+    17	decisions_reviewed=1
+    18	decision_keys=hand-review
+    19	pr=https://github.com/labcrew/notes/pull/42
+    20	pr_head=43d9bfd036be0c5d2fe97cdfb6330a9600b5723b
+--- mode ---
+mode=0600
+--- target fm_pr_metadata_identity_parse (expect PARSE_OK with the same PR identity) ---
+PARSE_OK provider=github url=https://github.com/labcrew/notes/pull/42 number=42
+--- invariant assertions ---
+last two rows:
+pr=https://github.com/labcrew/notes/pull/42
+pr_head=43d9bfd036be0c5d2fe97cdfb6330a9600b5723b
+poison rows count (expect 1 each):
+1
+1
+control_relaunch_tx rows (expect 1):
+1
+--- control-relaunch receipt ---
+v1
+task=labd0daf92a317c-worker
+phase=complete
+ts=2026-10-23T15:19:04Z
+backend=tmux
+endpoint=firstmate:fm-labd0daf92a317c-worker
+worktree=/private/tmp/fmlab.LydRD5/treehouse/.treehouse/notes-5ead3d/1/notes
+kind=ship
+from_harness=claude
+from_model=sonnet
+from_effort=low
+to_harness=claude
+to_model=sonnet
+to_effort=low
+worktree_head=43d9bfd036be0c5d2fe97cdfb6330a9600b5723b
+worktree_dirty=no
+note_file=/private/tmp/fmlab.LydRD5/home/state/labd0daf92a317c-worker.control-relaunch.note
+exit_result=stopped
+--- worker window after second relaunch ---
+lab pid=74618 cmd=zsh dead=0
+fm-labd0daf92a317c-worker pid=82133 cmd=2.1.309 dead=0
+main pid=25594 cmd=2.1.309 dead=0
+--- worker pane capture (replacement generation alive) ---
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+❯ 
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ⏵⏵ auto mode on (shift+tab to cycle)
