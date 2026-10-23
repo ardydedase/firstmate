@@ -16,9 +16,11 @@
 # the pane contains only one idle recognized shell with no child process. A
 # version 2 journal must also bind the exact workspace, tab, and pane.
 # Every home-local journal is parsed once per cleanup pass into a title-keyed
-# index; the mutation guards re-read live state by digesting the whole journal
-# directory once per check and re-parsing exactly any journal whose bytes
-# changed since the index, so no guard rescans every journal;
+# index; the mutation guards re-read live state by digesting once per check
+# exactly the ordinary journal files, plus one deliberately unparseable line
+# while the state directory is missing or a symlink, and re-parsing exactly
+# any journal whose digest changed since the index, so no guard rescans every
+# journal;
 # fm_herdr_cleanup_index_refresh documents its one deliberate exception, the
 # full rebuild on an unparseable digest line.
 # Topology is first checked from one locked API snapshot, then every mutation
@@ -72,15 +74,27 @@ fm_herdr_cleanup_home_identity() {
 # once into a title-keyed in-memory index, and each candidate workspace
 # matches against that index instead of rescanning every journal per workspace.
 # A matched record's journal stays existence-tested at lookup time, and the
-# mutation guards reconcile the index with live bytes instead of rescanning:
-# a matching whole-directory digest proves every row still mirrors its journal
-# byte for byte, while any digest divergence names exactly the journals that
-# were added, rewritten, or removed, and only those are re-parsed. Anything
-# stale or contested therefore degrades to conservative preservation, never
-# to a silently stale row.
+# mutation guards reconcile the index with the live journal directory instead
+# of rescanning: the digest checksums only ordinary journal files and gains a
+# deliberately unparseable line whenever the state directory stops being an
+# ordinary directory, so every file-type or directory transition either
+# changes a digest line or forces the full index rebuild on that line. A
+# matching digest therefore proves every row still mirrors its journal byte
+# for byte, while any divergence names exactly the journals that must be
+# re-read, and only those are re-parsed. Anything stale or contested
+# degrades to conservative preservation, never to a silently stale row.
 fm_herdr_cleanup_fingerprint() {
-  [ -d "$STATE" ] && [ ! -L "$STATE" ] || return 0
-  cksum "$STATE"/*"$FM_BACKEND_HERDR_PRESENTATION_JOURNAL_SUFFIX" 2>/dev/null
+  local journal
+  set --
+  [ -d "$STATE" ] && [ ! -L "$STATE" ] || {
+    printf '%s\n' 'fm-herdr-session-cleanup: state directory is missing or a symlink'
+    return 0
+  }
+  for journal in "$STATE"/*"$FM_BACKEND_HERDR_PRESENTATION_JOURNAL_SUFFIX"; do
+    [ -f "$journal" ] && [ ! -L "$journal" ] || continue
+    set -- "$@" "$journal"
+  done
+  [ "$#" -eq 0 ] || cksum "$@" 2>/dev/null
 }
 
 fm_herdr_cleanup_journal_validate() { # <journal> <id> <session> <home-real>
