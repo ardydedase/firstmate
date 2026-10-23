@@ -449,6 +449,36 @@ fm_pr_metadata_identity_parse() {
   [ -n "$FM_PR_META_URL" ]
 }
 
+# Rewrite the task record <src> into <dst>, replacing the named single-owner
+# <key> rows with the exact replacement rows read from stdin. The replacement
+# must not be appended at the end: a record already carrying its PR identity
+# ends with pr= followed only by pr_head=/x_* rows, and any other row appended
+# there poisons the very shape fm_pr_metadata_identity_parse accepts. The
+# replacement rows are therefore written after the ordinary rows and before
+# the deferred identity tail, in one pass under an already-held meta lock.
+# Stdin is read as the explicit '-' input file (not bare getline in BEGIN, which
+# reads the first file argument on the awk that ships with macOS), so the
+# replacements always come from the pipe and never from the record itself.
+fm_pr_metadata_key_rewrite() {  # <src> <dst> <key>...
+  local src=$1 dst=$2
+  shift 2
+  awk -F= -v drop_keys="$*" '
+    BEGIN {
+      n = split(drop_keys, k, " ")
+      for (i = 1; i <= n; i++) drop[k[i]] = 1
+    }
+    FILENAME == "-" { print; next }
+    $1 in drop { next }
+    {
+      if ($1 == "pr" || $1 == "pr_head" || $1 ~ /^x_/) tail[++t] = $0
+      else print
+    }
+    END {
+      for (i = 1; i <= t; i++) print tail[i]
+    }
+  ' "$src" - >"$dst"
+}
+
 # Sidecar layout: provider, url, host, path, number, one per line. A sidecar
 # written before the provider tag existed has a URL on its first line and one
 # line fewer, so it fails both the field count and the provider comparison and

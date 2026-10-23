@@ -27,6 +27,8 @@ set -u
 . "$ROOT/bin/fm-trace-context-lib.sh"
 # shellcheck source=/dev/null
 . "$ROOT/bin/fm-tasks-axi-lib.sh"
+# shellcheck source=bin/fm-pr-lib.sh
+. "$ROOT/bin/fm-pr-lib.sh"
 
 CONTROL="$ROOT/bin/fm-control.sh"
 SPAWN="$ROOT/bin/fm-spawn.sh"
@@ -471,23 +473,95 @@ test_relaunch_preserves_durable_task_metadata() {
   dir=$(new_case durable-meta rl19)
   add_ship_task "$dir" rl19 claude
   {
-    printf '%s\n' 'pr=https://github.com/example/repo/pull/19'
-    printf '%s\n' 'pr_head=feature/relaunch'
     printf '%s\n' 'x_request=request-19'
     printf '%s\n' 'decisions_reviewed=1'
+    printf '%s\n' 'pr=https://github.com/example/repo/pull/19'
+    printf '%s\n' 'pr_head=0123456789abcdef0123456789abcdef01234567'
   } >> "$dir/home/state/rl19.meta"
 
   out=$(run_control "$dir" rl19 relaunch --note "continuing review work"); rc=$?
   expect_code 0 "$rc" "relaunch should preserve durable metadata"$'\n'"$out"
   [ "$(meta_field "$dir" rl19 pr)" = "https://github.com/example/repo/pull/19" ] \
     || fail "the task PR must survive relaunch"
-  [ "$(meta_field "$dir" rl19 pr_head)" = "feature/relaunch" ] \
+  [ "$(meta_field "$dir" rl19 pr_head)" = "0123456789abcdef0123456789abcdef01234567" ] \
     || fail "the task PR head must survive relaunch"
   [ "$(meta_field "$dir" rl19 x_request)" = "request-19" ] \
     || fail "the task X request must survive relaunch"
   [ "$(meta_field "$dir" rl19 decisions_reviewed)" = 1 ] \
     || fail "the task decision state must survive relaunch"
+  fm_pr_metadata_identity_parse "$dir/home/state/rl19.meta" \
+    || fail "the relaunch rewrite must leave the record's PR identity parseable"
+  [ "$FM_PR_META_URL" = "https://github.com/example/repo/pull/19" ] \
+    || fail "the parseable PR identity changed across relaunch"
   pass "fm-control relaunch: durable task metadata survives replacement launch publication"
+}
+
+# The record's PR identity tail drives PR movement monitoring: pr= is the
+# last-key line, followed only by pr_head=/x_* rows
+# (fm_pr_metadata_identity_parse). A relaunch rewrites the whole record and
+# rewrites the trace carrier and every tenure-scoped session binding, so each
+# of those paths must keep its fresh rows before that tail instead of
+# appending after it; control_relaunch_tx after pr_head= is the exact shape
+# that once broke three live tasks.
+test_relaunch_keeps_pr_identity_tail_parseable_after_rewrites() {
+  local dir out rc meta poisoned staged tail_bad traceparent
+  dir=$(new_case pr-identity-tail rl51)
+  add_ship_task "$dir" rl51 claude
+  meta="$dir/home/state/rl51.meta"
+  {
+    printf '%s\n' 'polytoken_credential=stale'
+    printf '%s\n' 'traceparent=00-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-bbbbbbbbbbbbbbbb-01'
+    printf '%s\n' 'pr=https://github.com/example/repo/pull/51'
+    printf '%s\n' 'pr_head=0123456789abcdef0123456789abcdef01234567'
+  } >> "$meta"
+  printf '%s\n' "$$" > "$dir/home/state/.lock"
+  printf '%s on\n' "$$" > "$dir/home/state/.trace-context-effective"
+
+  # The failure shape this suite pins: an ordinary key appended after pr_head=
+  # makes the identity parser reject the whole record.
+  poisoned="$dir/poisoned.meta"
+  {
+    printf '%s\n' 'window=firstmate:fm-rl51'
+    printf '%s\n' 'pr=https://github.com/example/repo/pull/51'
+    printf '%s\n' 'pr_head=0123456789abcdef0123456789abcdef01234567'
+    printf 'control_relaunch_tx=%s\n' '9.20241017T000000Z.1'
+  } > "$poisoned"
+  ! fm_pr_metadata_identity_parse "$poisoned" \
+    || fail "the fixture no longer models the poisoned shape this test pins"
+
+  out=$(run_control "$dir" rl51 relaunch --note "continue after the PR came up"); rc=$?
+  expect_code 0 "$rc" "a relaunch of a PR-ready task should succeed"$'\n'"$out"
+  [ -n "$(meta_field "$dir" rl51 control_relaunch_tx)" ] \
+    || fail "the relaunch transaction marker must be recorded"
+  traceparent=$(meta_field "$dir" rl51 traceparent)
+  fm_trace_context_valid "$traceparent" \
+    || fail "the fresh trace carrier must be recorded"
+  fm_pr_metadata_identity_parse "$meta" \
+    || fail "the relaunch rewrite poisoned the PR identity tail"
+  [ "$FM_PR_META_URL" = "https://github.com/example/repo/pull/51" ] \
+    || fail "the PR identity must survive the relaunch rewrite"
+  tail_bad=$(awk '$1 == "pr" { seen = 1; next }
+    seen && $1 != "pr_head" && $1 !~ /^x_/ { print }' "$meta")
+  [ -z "$tail_bad" ] \
+    || fail "the relaunch rewrite left ordinary rows after the PR identity tail: $tail_bad"
+
+  # Multi-row rewrites take the same road: the helper a tenure handoff uses to
+  # rebind its session rows (polytoken_session/port/credential here) drops the
+  # old rows and writes the fresh ones before the identity tail.
+  staged="$dir/staged.meta"
+  printf '%s\n%s\n' 'polytoken_session=new' 'polytoken_credential=new' |
+    fm_pr_metadata_key_rewrite "$meta" "$staged" \
+      polytoken_session polytoken_port polytoken_credential \
+    || fail "the key-rewrite helper refused a parseable record"
+  fm_pr_metadata_identity_parse "$staged" \
+    || fail "a multi-row key rewrite poisoned the PR identity tail"
+  [ "$(grep '^polytoken_session=' "$staged")" = 'polytoken_session=new' ] \
+    || fail "the staged rewrite did not carry the replacement rows"
+  [ "$(grep -c '^polytoken_credential=' "$staged")" = 1 ] \
+    || fail "a rewritten single-owner key must appear exactly once"
+  [ "$(tail -n 1 "$staged")" = 'pr_head=0123456789abcdef0123456789abcdef01234567' ] \
+    || fail "a staged rewrite reordered the identity tail"
+  pass "fm-control relaunch: relaunch rewrites keep the PR identity tail parseable"
 }
 
 test_relaunch_serializes_concurrent_durable_metadata_publication() {
@@ -2974,6 +3048,7 @@ test_relaunch_refuses_before_exit_when_the_composer_holds_pending_text
 test_relaunch_refuses_before_exit_when_the_composer_state_is_unproven
 test_relaunch_from_linked_home_preserves_recorded_worktree
 test_relaunch_preserves_durable_task_metadata
+test_relaunch_keeps_pr_identity_tail_parseable_after_rewrites
 test_relaunch_serializes_concurrent_durable_metadata_publication
 test_disabled_relaunch_clears_prior_trace_context
 test_relaunch_appends_the_progress_note_to_the_instructions
