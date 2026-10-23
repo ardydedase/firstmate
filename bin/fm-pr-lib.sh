@@ -484,6 +484,8 @@ fm_pr_metadata_identity_parse() {
 fm_pr_metadata_key_rewrite() {  # <src> <dst> <key>...
   local src=$1 dst=$2
   shift 2
+  rm -f -- "$dst" || return 1
+  (umask 077 && : >"$dst") || return 1
   awk -F= -v drop_keys="$*" '
     BEGIN {
       n = split(drop_keys, k, " ")

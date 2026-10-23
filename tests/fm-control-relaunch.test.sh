@@ -563,6 +563,8 @@ test_relaunch_keeps_pr_identity_tail_parseable_after_rewrites() {
     || fail "a rewritten single-owner key must appear exactly once"
   [ "$(tail -n 1 "$staged")" = 'pr_head=0123456789abcdef0123456789abcdef01234567' ] \
     || fail "a staged rewrite reordered the identity tail"
+  [ "$(fm_pr_file_mode "$staged")" = 600 ] \
+    || fail "a staged rewrite exposed the record copy at ambient mode"
   fm_pr_task_record_stage_private "$staged" "$dir/home/state" \
     || fail "a staged rewrite refused to stay private at 0600 on its state device"
   pass "fm-control relaunch: relaunch rewrites keep the PR identity tail parseable"

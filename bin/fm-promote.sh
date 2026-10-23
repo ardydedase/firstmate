@@ -373,14 +373,14 @@ fi
 BRIEF_REPLACEMENT=
 
 TMP="$STATE/.$ID.meta.promote.${BASHPID:-$$}"
-{
-  echo "kind=ship"
-  echo "mode=$MODE"
-  echo "yolo=$YOLO"
-  echo "branch=$BRANCH"
-  [ -z "$UPSTREAM_CONSENT" ] || echo "upstream_consent=$UPSTREAM_CONSENT"
-} | fm_pr_metadata_key_rewrite "$META" "$TMP" kind mode yolo branch upstream_consent
-if ! fm_pr_task_record_stage_private "$TMP" "$STATE" ||
+if ! {
+    echo "kind=ship"
+    echo "mode=$MODE"
+    echo "yolo=$YOLO"
+    echo "branch=$BRANCH"
+    [ -z "$UPSTREAM_CONSENT" ] || echo "upstream_consent=$UPSTREAM_CONSENT"
+  } | fm_pr_metadata_key_rewrite "$META" "$TMP" kind mode yolo branch upstream_consent ||
+  ! fm_pr_task_record_stage_private "$TMP" "$STATE" ||
   ! fm_backlog_atomic_transition publish "$TMP" "$META" "task record" "$STATE"; then
   rm -f -- "$TMP"
   TMP=
