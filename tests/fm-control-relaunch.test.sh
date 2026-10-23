@@ -570,6 +570,40 @@ test_relaunch_keeps_pr_identity_tail_parseable_after_rewrites() {
   pass "fm-control relaunch: relaunch rewrites keep the PR identity tail parseable"
 }
 
+test_relaunch_heals_a_legacy_poisoned_pr_tail() {
+  local dir out rc meta
+  dir=$(new_case legacy-pois-tail rl52)
+  add_ship_task "$dir" rl52 claude
+  meta="$dir/home/state/rl52.meta"
+  {
+    printf '%s\n' 'pr=https://github.com/example/repo/pull/52'
+    printf '%s\n' 'pr_head=0123456789abcdef0123456789abcdef01234567'
+    printf '%s\n' 'x_request=0.20241017T000000Z.1'
+    printf '%s\n' 'decisions_reviewed=1'
+    printf '%s\n' 'decision_keys=review-handled'
+  } >> "$meta"
+  chmod 0600 "$meta" \
+    || fail "could not arm the fixture task record the way merge-watch arms it"
+  ! fm_pr_metadata_identity_parse "$meta" \
+    || fail "the fixture no longer models the poisoned shape this test pins"
+  out=$(run_control "$dir" rl52 relaunch --note "continue after the review completed"); rc=$?
+  expect_code 0 "$rc" "a relaunch of a task carrying legacy post-tail rows should still succeed"$'\n'"$out"
+  fm_pr_metadata_identity_parse "$meta" \
+    || fail "the relaunch re-published legacy rows after the PR identity tail instead of healing them"
+  [ "$FM_PR_META_URL" = "https://github.com/example/repo/pull/52" ] \
+    || fail "the PR identity must survive a poisoned-input relaunch"
+  [ "$(tail -n 3 "$meta")" = "$(printf '%s\n%s\n%s\n' \
+    'pr=https://github.com/example/repo/pull/52' \
+    'pr_head=0123456789abcdef0123456789abcdef01234567' \
+    'x_request=0.20241017T000000Z.1')" ] \
+    || fail "the preserved identity tail must be the last rows after a poisoned-input relaunch"
+  [ "$(grep -c '^decisions_reviewed=1' "$meta")" = 1 ] \
+    || fail "the legacy decision rows must be preserved ahead of the identity tail"
+  [ "$(grep -c '^decision_keys=' "$meta")" = 1 ] \
+    || fail "the legacy decision key row must be preserved ahead of the identity tail"
+  pass "fm-control relaunch: relaunching heals a legacy poisoned PR identity tail"
+}
+
 test_relaunch_serializes_concurrent_durable_metadata_publication() {
   local dir control_pid link_pid rc i=0 traceparent prepare launch_release waiting ready release
   dir=$(new_case metadata-race rl28)
@@ -3055,6 +3089,7 @@ test_relaunch_refuses_before_exit_when_the_composer_state_is_unproven
 test_relaunch_from_linked_home_preserves_recorded_worktree
 test_relaunch_preserves_durable_task_metadata
 test_relaunch_keeps_pr_identity_tail_parseable_after_rewrites
+test_relaunch_heals_a_legacy_poisoned_pr_tail
 test_relaunch_serializes_concurrent_durable_metadata_publication
 test_disabled_relaunch_clears_prior_trace_context
 test_relaunch_appends_the_progress_note_to_the_instructions

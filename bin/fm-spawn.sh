@@ -6192,7 +6192,14 @@ preserve_relaunch_meta() {
       split("window endpoint_task_id worktree project harness kind mode yolo branch tasktmp base_branch upstream_consent forge backup_remote backup_prefix model effort opencode_version account account_provider busy_gen spawn_gen approval_mode traceparent backend herdr_session herdr_workspace_id herdr_tab_id herdr_pane_id zellij_session zellij_tab_id zellij_pane_id orca_worktree_id terminal cmux_workspace_id cmux_surface_id paseo_terminal_id paseo_workspace_id rex_server rex_session_id rex_window_id rex_block_id home projects control_relaunch_tx polytoken_session polytoken_port polytoken_credential", keys, " ")
       for (i in keys) owned[keys[i]] = 1
     }
-    !($1 in owned)
+    {
+      if ($1 in owned) next
+      if ($1 == "pr" || $1 == "pr_head" || $1 ~ /^x_/) tail[++t] = $0
+      else print
+    }
+    END {
+      for (i = 1; i <= t; i++) print tail[i]
+    }
   ' "$RELAUNCH_META"
 }
 {
