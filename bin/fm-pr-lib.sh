@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 # Shared PR/MR record reads, validation, and atomic artifact helpers for merge
-# polling on the supported forges. Callers must validate task IDs and raw PR/MR
+# polling on the supported forges, plus the shared task-record key rewrite and
+# staged-private publication the scripts that republish a live record use
+# (fm_pr_metadata_key_rewrite, fm_pr_task_record_stage_private, whose comments
+# own those contracts). Callers must validate task IDs and raw PR/MR
 # URLs before constructing task paths or performing any side effect.
 #
 # The stored identity is provider-tagged: provider, url, host, path, number.
