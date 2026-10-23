@@ -10,6 +10,8 @@ set -u
 . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 # shellcheck source=bin/fm-timeout-lib.sh
 . "$ROOT/bin/fm-timeout-lib.sh"
+# shellcheck source=bin/fm-pr-lib.sh
+. "$ROOT/bin/fm-pr-lib.sh"
 
 TEARDOWN="$ROOT/bin/fm-teardown.sh"
 BEARINGS="$ROOT/bin/fm-bearings-snapshot.sh"
@@ -1261,6 +1263,40 @@ test_visual_review_uses_shared_completion_owner() {
   [ ! -e "$home/data/visual-review-decisions.json" ] \
     || fail "visual review created a second decision database"
   pass "ended visual review follows the same captain-hold completion owner"
+}
+
+test_complete_keeps_pr_identity_tail_parseable() {
+  local home id meta
+  home=$(make_home complete-pr-tail)
+  id=sample-merge-watch
+  mkdir -p "$home/data/$id"
+  meta="$home/state/$id.meta"
+  fm_write_meta "$meta" \
+    "window=firstmate:fm-$id" \
+    "worktree=$home/projects/missing-$id" \
+    "project=$home/projects/sample" \
+    "harness=codex" \
+    "kind=ship" \
+    "mode=max" \
+    "spawn_gen=fixture-$id" \
+    "pr=https://github.com/example/repo/pull/19" \
+    "pr_head=0123456789abcdef0123456789abcdef01234567"
+  printf 'done: report complete\n' > "$home/state/$id.status"
+  run_captain "$home" complete "$id" --none >/dev/null \
+    || fail "completing a PR-bound review failed"
+  fm_pr_metadata_identity_parse "$meta" \
+    || fail "the completed-inventory attestation poisoned the task record's PR identity tail"
+  [ "$FM_PR_META_URL" = "https://github.com/example/repo/pull/19" ] \
+    || fail "the completed-inventory attestation changed the task's PR identity"
+  [ "$(grep -c '^decisions_reviewed=1$' "$meta")" = 1 ] \
+    || fail "the completed-inventory attestation was not recorded exactly once"
+  [ "$(grep -c '^decision_keys=$' "$meta")" = 1 ] \
+    || fail "the empty reviewed inventory was not recorded exactly once"
+  [ "$(tail -n 1 "$meta")" = 'pr_head=0123456789abcdef0123456789abcdef01234567' ] \
+    || fail "the attestation reordered the task record's PR identity tail"
+  run_captain "$home" verify "$id" >/dev/null \
+    || fail "the recorded inventory no longer verifies after attestation"
+  pass "the completion attestation keeps the task record's PR identity tail parseable"
 }
 
 test_none_inventory_and_resolved_prose_do_not_create_holds() {
@@ -4778,6 +4814,7 @@ test_interrupted_answer_preserves_hold_age
 test_deferral_leaves_captains_call_until_due
 test_out_of_band_close_is_recordable
 test_visual_review_uses_shared_completion_owner
+test_complete_keeps_pr_identity_tail_parseable
 test_none_inventory_and_resolved_prose_do_not_create_holds
 test_terminal_single_owner_status_decision_does_not_block_empty_inventory
 test_secondmate_hold_stays_in_authoritative_home

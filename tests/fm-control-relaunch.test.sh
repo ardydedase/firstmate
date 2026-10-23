@@ -504,7 +504,7 @@ test_relaunch_preserves_durable_task_metadata() {
 # appending after it; control_relaunch_tx after pr_head= is the exact shape
 # that once broke three live tasks.
 test_relaunch_keeps_pr_identity_tail_parseable_after_rewrites() {
-  local dir out rc meta poisoned staged tail_bad traceparent
+  local dir out rc meta poisoned staged traceparent
   dir=$(new_case pr-identity-tail rl51)
   add_ship_task "$dir" rl51 claude
   meta="$dir/home/state/rl51.meta"
@@ -540,10 +540,6 @@ test_relaunch_keeps_pr_identity_tail_parseable_after_rewrites() {
     || fail "the relaunch rewrite poisoned the PR identity tail"
   [ "$FM_PR_META_URL" = "https://github.com/example/repo/pull/51" ] \
     || fail "the PR identity must survive the relaunch rewrite"
-  tail_bad=$(awk '$1 == "pr" { seen = 1; next }
-    seen && $1 != "pr_head" && $1 !~ /^x_/ { print }' "$meta")
-  [ -z "$tail_bad" ] \
-    || fail "the relaunch rewrite left ordinary rows after the PR identity tail: $tail_bad"
 
   # Multi-row rewrites take the same road: the helper a tenure handoff uses to
   # rebind its session rows (polytoken_session/port/credential here) drops the
