@@ -18,7 +18,9 @@
 # Every home-local journal is parsed once per cleanup pass into a title-keyed
 # index; the mutation guards re-read live state by digesting the whole journal
 # directory once per check and re-parsing exactly any journal whose bytes
-# changed since the index, so no guard ever rescans every journal.
+# changed since the index, so no guard rescans every journal;
+# fm_herdr_cleanup_index_refresh documents its one deliberate exception, the
+# full rebuild on an unparseable digest line.
 # Topology is first checked from one locked API snapshot, then every mutation
 # prerequisite is immediately rechecked before the existing exact-pane
 # focus-preserving close helper is called.
@@ -74,8 +76,8 @@ fm_herdr_cleanup_home_identity() {
 # a matching whole-directory digest proves every row still mirrors its journal
 # byte for byte, while any digest divergence names exactly the journals that
 # were added, rewritten, or removed, and only those are re-parsed. Anything
-# stale or contested therefore degrades to conservative preservation without
-# a per-mutation directory rescan.
+# stale or contested therefore degrades to conservative preservation, never
+# to a silently stale row.
 fm_herdr_cleanup_fingerprint() {
   [ -d "$STATE" ] && [ ! -L "$STATE" ] || return 0
   cksum "$STATE"/*"$FM_BACKEND_HERDR_PRESENTATION_JOURNAL_SUFFIX" 2>/dev/null
