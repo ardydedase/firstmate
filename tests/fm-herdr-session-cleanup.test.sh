@@ -62,6 +62,7 @@ TAB=w2:t1
 PANE=w2:p1
 TITLE="└ task · p:$TOKEN"
 FIXTURE_DIR="$TMP_ROOT/fixture"
+OUTSIDE_HOME_STATE="$TMP_ROOT/outside-home-state"
 LOCK_LOG="$TMP_ROOT/locks.log"
 CLOSE_LOG="$TMP_ROOT/closes.log"
 mkdir -p "$FIXTURE_DIR"
@@ -177,6 +178,16 @@ fm_backend_herdr_cli() {
       if [ -e "$FIXTURE_DIR/late-extra" ]; then
         rm -f "$FIXTURE_DIR/late-extra"
         write_v1 probe-extra QyQyQyQyQyQyQyQyQyQyQy0
+      fi
+      if [ -e "$FIXTURE_DIR/late-materialized-journal" ]; then
+        rm -f "$FIXTURE_DIR/late-materialized-journal"
+        rm -f "$FM_STATE_OVERRIDE/fm-task.herdr-presentation"
+        cp "$FIXTURE_DIR/mirror-journal" "$FM_STATE_OVERRIDE/fm-task.herdr-presentation"
+      fi
+      if [ -e "$FIXTURE_DIR/late-state-symlink" ]; then
+        rm -f "$FIXTURE_DIR/late-state-symlink"
+        mv "$FM_STATE_OVERRIDE" "$FM_STATE_OVERRIDE.preserved"
+        ln -s "$OUTSIDE_HOME_STATE" "$FM_STATE_OVERRIDE"
       fi
       printf '{"result":{"snapshot":{"focused_workspace_id":"w1","focused_tab_id":"%s","focused_pane_id":"w1:p1","workspaces":' "$(cat "$FIXTURE_DIR/active-tab")"
       fixture_workspaces
@@ -350,6 +361,45 @@ fm_herdr_session_cleanup >/dev/null 2>&1
 [ "$_parse_calls" = 3 ] \
   || fail "mid-pass change parsed journals $_parse_calls times instead of exactly the changed journal"
 pass "guards re-parse only the changed journal and still close"
+
+# A journal parked as a symlink at pass start has no row, but the digest must
+# make its byte-identical materialization a visible change the same way a
+# rewrite is visible, so the guards preserve the pane while two same-titled
+# journals exist instead of closing on the one indexed row.
+reset_fixture
+write_v1 fm-task
+cp "$FM_STATE_OVERRIDE/fm-task.herdr-presentation" "$FIXTURE_DIR/mirror-journal"
+rm -f "$FM_STATE_OVERRIDE/fm-task.herdr-presentation"
+ln -s "$FIXTURE_DIR/mirror-journal" "$FM_STATE_OVERRIDE/fm-task.herdr-presentation"
+: > "$FIXTURE_DIR/late-materialized-journal"
+fm_herdr_session_cleanup >/dev/null 2>&1
+[ -f "$FM_STATE_OVERRIDE/$ID.herdr-presentation" ] \
+  || fail "byte-identical materialized journal retired the candidate"
+[ -f "$FM_STATE_OVERRIDE/fm-task.herdr-presentation" ] \
+  || fail "byte-identical materialized journal was itself retired"
+[ ! -s "$CLOSE_LOG" ] \
+  || fail "byte-identical materialized journal closed the pane"
+pass "guards catch a byte-identical journal materializing from a symlink"
+
+# The state directory itself swapping mid-pass for a symlink to byte-identical
+# journal copies outside the effective FM_HOME invalidates the reconciled
+# index: the guards must preserve the candidate and leave both journal stores
+# untouched, the same way the base per-guard live rescan skipped a symlinked
+# state directory.
+reset_fixture
+mkdir -p "$OUTSIDE_HOME_STATE"
+cp "$FM_STATE_OVERRIDE/$ID.herdr-presentation" "$OUTSIDE_HOME_STATE/$ID.herdr-presentation"
+: > "$FIXTURE_DIR/late-state-symlink"
+fm_herdr_session_cleanup >/dev/null 2>&1
+[ -f "$FM_STATE_OVERRIDE.preserved/$ID.herdr-presentation" ] \
+  || fail "symlinked state directory retired the home journal"
+[ -f "$OUTSIDE_HOME_STATE/$ID.herdr-presentation" ] \
+  || fail "symlinked state directory acted on a journal outside the effective FM_HOME"
+[ ! -s "$CLOSE_LOG" ] \
+  || fail "symlinked state directory closed the pane"
+rm -f "$FM_STATE_OVERRIDE"
+mv "$FM_STATE_OVERRIDE.preserved" "$FM_STATE_OVERRIDE"
+pass "guards preserve both stores when the state directory becomes a symlink"
 
 # Candidate discovery must parse each home-local journal exactly once per
 # cleanup pass however many grammar-matching candidate workspaces exist.
