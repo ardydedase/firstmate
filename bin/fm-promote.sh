@@ -380,7 +380,8 @@ TMP="$STATE/.$ID.meta.promote.${BASHPID:-$$}"
   echo "branch=$BRANCH"
   [ -z "$UPSTREAM_CONSENT" ] || echo "upstream_consent=$UPSTREAM_CONSENT"
 } | fm_pr_metadata_key_rewrite "$META" "$TMP" kind mode yolo branch upstream_consent
-if ! fm_backlog_atomic_transition publish "$TMP" "$META" "task record" "$STATE"; then
+if ! fm_pr_task_record_stage_private "$TMP" "$STATE" ||
+  ! fm_backlog_atomic_transition publish "$TMP" "$META" "task record" "$STATE"; then
   rm -f -- "$TMP"
   TMP=
   echo "error: task record for $ID could not be published ($FM_BACKLOG_TRANSITION_ERROR)" >&2

@@ -407,6 +407,28 @@ fm_pr_regular_destination_on_device_or_absent() {
   [ ! -e "$path" ] || [ "$(fm_pr_file_device "$path")" = "$device" ]
 }
 
+# Publication of a task record replaces whatever mode it published with, so a
+# staged copy about to become the live record is made private first, under the
+# same 600 posture bin/fm-pr-check.sh arms merge-watch records with. The
+# state directory's device is read fresh in the same invocation, matching
+# fm_pr_private_file_valid's contract, and each failure names its reason in
+# the publication error channel its callers already surface.
+fm_pr_task_record_stage_private() {  # <staged> <state-dir>
+  local staged=$1 device reason=
+  if ! device=$(fm_pr_file_device "$2"); then
+    reason="state directory is unavailable at $2"
+  elif ! chmod 0600 "$staged"; then
+    reason="staged task record could not be made private at $staged"
+  elif ! fm_pr_private_file_valid "$staged" 600 "$device"; then
+    reason="staged task record at $staged is not a private 0600 file on its state device"
+  else
+    return 0
+  fi
+  # shellcheck disable=SC2034 # publication error channel; callers surface it
+  FM_BACKLOG_TRANSITION_ERROR=$reason
+  return 1
+}
+
 fm_pr_metadata_identity_parse() {
   local file=$1 line value pr_count=0 seen_pr=0 post_pr_invalid=0
   FM_PR_META_PROVIDER=
