@@ -1,0 +1,50 @@
+
+The default interactive shell is now zsh.
+To update your account to use zsh, please run `chsh -s /bin/zsh`.
+For more details, please visit https://support.apple.com/kb/HT208050.
+bash-3.2$ printf "S2-ENTRY meta=[%s] status=[%s]\n" "${FM_CREW_STATE_META_OVERRIDE-__UNSET__}" "${FM_CREW_STATE_STATUS_OVERRIDE-__UNSET__}" ; echo __MK17__ $?
+S2-ENTRY meta=[__UNSET__] status=[/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T//fm-lab.m6CXJt/captured-2/leaktask.status]
+__MK17__ 0
+bash-3.2$ n=$(env | grep -c "^FM_CREW_STATE_.*OVERRIDE=" || true); printf "S2-OVERRIDE-VAR-COUNT=%s\n" "$n" ; echo __MK18__ $?
+S2-OVERRIDE-VAR-COUNT=1
+__MK18__ 0
+bash-3.2$ echo "S2-CONTROL-READ (override removed for this child only):" ; echo __MK19__ $?
+S2-CONTROL-READ (override removed for this child only):
+__MK19__ 0
+bash-3.2$ env -u FM_CREW_STATE_STATUS_OVERRIDE /Users/adedase/.no-mistakes/worktrees/527df5d885a5/01M5KXBEMGNCKZK289WMESYWAM/bin/fm-crew-state.sh leaktask ; echo __MK20__ $?
+state: working · source: status-log · live status from the lab
+__MK20__ 0
+bash-3.2$ echo "S2-OVERRIDE-READ (parent override honored):" ; echo __MK21__ $?
+S2-OVERRIDE-READ (parent override honored):
+__MK21__ 0
+bash-3.2$ /Users/adedase/.no-mistakes/worktrees/527df5d885a5/01M5KXBEMGNCKZK289WMESYWAM/bin/fm-crew-state.sh leaktask ; echo __MK22__ $?
+state: failed · source: status-log · stale captured stakes
+__MK22__ 0
+bash-3.2$ /Users/adedase/.no-mistakes/worktrees/527df5d885a5/01M5KXBEMGNCKZK289WMESYWAM/bin/fm-fleet-snapshot.sh --json > "$FM_HOME/s2.json"; printf "S2-SNAPSHOT-RC=%s\n" "$?" ; echo __MK23__ $?
+S2-SNAPSHOT-RC=0
+__MK23__ 0
+bash-3.2$ printf "S2-AFTER meta=[%s] status=[%s]\n" "${FM_CREW_STATE_META_OVERRIDE-__UNSET__}" "${FM_CREW_STATE_STATUS_OVERRIDE-__UNSET__}" ; echo __MK24__ $?
+S2-AFTER meta=[__UNSET__] status=[/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T//fm-lab.m6CXJt/captured-2/leaktask.status]
+__MK24__ 0
+bash-3.2$ n=$(env | grep -c "^FM_CREW_STATE_.*OVERRIDE=" || true); printf "S2-AFTER-OVERRIDE-VAR-COUNT=%s\n" "$n" ; echo __MK25__ $?
+S2-AFTER-OVERRIDE-VAR-COUNT=1
+__MK25__ 0
+bash-3.2$ [ "${FM_CREW_STATE_STATUS_OVERRIDE-__X__}" = "$FM_HOME/captured-2/leaktask.status" ] && echo "ok - S2: session shell keeps exactly the parent-set status override - no captured-path leak" || echo "NOT-OK - S2: s
+tatus env is [${FM_CREW_STATE_STATUS_OVERRIDE-__UNSET__}]" ; echo __MK26__ $?
+ok - S2: session shell keeps exactly the parent-set status override - no captured-path leak
+__MK26__ 0
+bash-3.2$ [ -z "${FM_CREW_STATE_META_OVERRIDE+Z}" ] && echo "ok - S2: meta override never materialized in the session shell" || echo "NOT-OK - S2: meta override materialized [${FM_CREW_STATE_META_OVERRIDE}]" ; echo __MK2
+7__ $?
+ok - S2: meta override never materialized in the session shell
+__MK27__ 0
+bash-3.2$ jq -e '.tasks[]|select(.id=="leaktask")|(.current_state.state=="working" and .current_state.source=="status-log" and .current_state.detail=="live status from the lab" and .endpoint.exists==true)' "$FM_HOME/s2.j
+son" >/dev/null && echo "ok - S2: snapshot child read the live crew state despite the ambient status override" || echo "NOT-OK - S2: snapshot child read polluted by ambient override" ; echo __MK28__ $?
+ok - S2: snapshot child read the live crew state despite the ambient status override
+__MK28__ 0
+bash-3.2$ echo "S2-REPEAT-READ (still the parent override after the snapshot):" ; echo __MK29__ $?
+S2-REPEAT-READ (still the parent override after the snapshot):
+__MK29__ 0
+bash-3.2$ /Users/adedase/.no-mistakes/worktrees/527df5d885a5/01M5KXBEMGNCKZK289WMESYWAM/bin/fm-crew-state.sh leaktask ; echo __MK30__ $?
+state: failed · source: status-log · stale captured stakes
+__MK30__ 0
+bash-3.2$

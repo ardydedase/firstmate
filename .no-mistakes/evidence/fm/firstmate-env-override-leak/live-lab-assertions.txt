@@ -1,0 +1,48 @@
+lab home: /var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T//fm-lab.m6CXJt (mktemp; removed by this run's exit trap)
+ok - primary pane launched on lab socket fm-lab, grid non-zero (220x50)
+ok - S1: session shell inherited the parent-set META override verbatim
+ok - S1: META override in the session shell stayed exactly the parent-set value after the snapshot ran
+ok - S1: exactly one crew-state override variable exists in the session shell env after the snapshot
+ok - S1: control crew-state read with override removed shows live meta behavior (working from status log)
+ok - S1: crew-state honored the META override (torn-down worktree of the captured generation)
+ok - S1: fleet snapshot exited 0 inside the session shell
+ok - S1: no captured-path leak into the session shell (in-shell check)
+ok - S1: no status override materialized (in-shell check)
+ok - S1: snapshot child read live state despite ambient META override (in-shell check)
+ok - S1: fleet view render exited 0
+ok - S1: fleet view render mentions the crew task
+ok - S1: repeat read driven after the snapshot
+ok - S1: every driven pane step returned rc 0
+ok - primary pane launched on lab socket fm-lab, grid non-zero (220x50)
+ok - S2: session shell inherited the parent-set STATUS override verbatim
+ok - S2: STATUS override in the session shell stayed exactly the parent-set value after the snapshot ran
+ok - S2: exactly one crew-state override variable exists in the session shell env after the snapshot
+ok - S2: control crew-state read with override removed shows live status behavior
+ok - S2: crew-state honored the STATUS override (stale captured status)
+ok - S2: fleet snapshot exited 0 inside the session shell
+ok - S2: no captured-path leak into the session shell (in-shell check)
+ok - S2: no meta override materialized (in-shell check)
+ok - S2: snapshot child read live state despite ambient STATUS override (in-shell check)
+ok - S2: repeat read driven after the snapshot
+ok - S2: every driven pane step returned rc 0
+ok - primary pane launched on lab socket fm-lab, grid non-zero (220x50)
+ok - S3: session shell launched with neither override present
+ok - S3: zero override variables at launch
+ok - S3: default crew-state behavior unchanged (working from status log)
+ok - S3: command-form fleet snapshot exited 0 in the session shell
+ok - S3: command-form snapshot left no override values in the session shell
+ok - S3: command-form snapshot appended no override variables to the env
+ok - S3: command-form leak probes clean (in-shell check)
+ok - S3: live status log read after snapshot shows the fresh live update
+ok - S3: later reads resolve live state (in-shell check)
+ok - S3: sourced fleet snapshot exited 0 in the session shell
+ok - S3: sourced snapshot left no override values in the session shell
+ok - S3: sourced snapshot appended no override variables to the env
+ok - S3: sourced-form leak probes clean (in-shell check)
+ok - S3: post-source live read reflects the fresh live status update
+ok - S3: snapshot exited 0 with deliberately poisoned ambient overrides
+ok - S3: poisoned ambient overrides cannot corrupt the snapshot's own read (in-shell check)
+ok - S3: env fully restored after unsetting the deliberate poison exports
+ok - S3: final default read resolves current live state
+ok - S3: every driven pane step returned rc 0
+SUMMARY: ok-assertions=46 not-ok-assertions=0

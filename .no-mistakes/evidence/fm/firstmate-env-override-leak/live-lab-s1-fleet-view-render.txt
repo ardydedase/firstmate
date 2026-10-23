@@ -1,0 +1,18 @@
+# Fleet View
+
+Schema: fm-fleet-snapshot.v1
+Home: /var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T//fm-lab.m6CXJt
+
+## Under Way
+| ID | Current | Kind | Repo/Project | Backend | Endpoint | Artifact | Path | Watch / return channel |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| leaktask | working / status-log | scout | alpha | tmux | present | /var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T//fm-lab.m6CXJt/data/leaktask/report.md | /var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T//fm-lab.m6CXJt/projects/leaktask-wt | bin/fm-peek.sh fm-leaktask |
+
+## Queued
+No queued backlog records found.
+
+## Done
+No done backlog records found.
+
+## Secondmates
+For kind=secondmate, bearings selects validated structured state from that registered home; parent events and bounded terminal evidence are fallback-only supplements and never current-state authority.

@@ -1,0 +1,98 @@
+
+The default interactive shell is now zsh.
+To update your account to use zsh, please run `chsh -s /bin/zsh`.
+For more details, please visit https://support.apple.com/kb/HT208050.
+bash-3.2$ printf "S3-ENTRY meta=[%s] status=[%s]\n" "${FM_CREW_STATE_META_OVERRIDE-__UNSET__}" "${FM_CREW_STATE_STATUS_OVERRIDE-__UNSET__}" ; echo __MK31__ $?
+S3-ENTRY meta=[__UNSET__] status=[__UNSET__]
+__MK31__ 0
+bash-3.2$ n=$(env | grep -c "^FM_CREW_STATE_.*OVERRIDE=" || true); printf "S3-OVERRIDE-VAR-COUNT=%s\n" "$n" ; echo __MK32__ $?
+S3-OVERRIDE-VAR-COUNT=0
+__MK32__ 0
+bash-3.2$ echo "S3-DEFAULT-READ (default behavior with no overrides):" ; echo __MK33__ $?
+S3-DEFAULT-READ (default behavior with no overrides):
+__MK33__ 0
+bash-3.2$ /Users/adedase/.no-mistakes/worktrees/527df5d885a5/01M5KXBEMGNCKZK289WMESYWAM/bin/fm-crew-state.sh leaktask ; echo __MK34__ $?
+state: working · source: status-log · live status from the lab
+__MK34__ 0
+bash-3.2$ echo "S3-CMD-FORM (snapshot as a plain command in the session shell):" ; echo __MK35__ $?
+S3-CMD-FORM (snapshot as a plain command in the session shell):
+__MK35__ 0
+bash-3.2$ /Users/adedase/.no-mistakes/worktrees/527df5d885a5/01M5KXBEMGNCKZK289WMESYWAM/bin/fm-fleet-snapshot.sh --json > "$FM_HOME/s3.json"; printf "S3-SNAPSHOT-RC=%s\n" "$?" ; echo __MK36__ $?
+S3-SNAPSHOT-RC=0
+__MK36__ 0
+bash-3.2$ printf "S3-AFTER-CMD meta=[%s] status=[%s]\n" "${FM_CREW_STATE_META_OVERRIDE-__UNSET__}" "${FM_CREW_STATE_STATUS_OVERRIDE-__UNSET__}" ; echo __MK37__ $?
+S3-AFTER-CMD meta=[__UNSET__] status=[__UNSET__]
+__MK37__ 0
+bash-3.2$ n=$(env | grep -c "^FM_CREW_STATE_.*OVERRIDE=" || true); printf "S3-AFTER-CMD-OVERRIDE-VAR-COUNT=%s\n" "$n" ; echo __MK38__ $?
+S3-AFTER-CMD-OVERRIDE-VAR-COUNT=0
+__MK38__ 0
+bash-3.2$ [ "${FM_CREW_STATE_META_OVERRIDE-__UNSET__}" = "__UNSET__" ] && [ "${FM_CREW_STATE_STATUS_OVERRIDE-__UNSET__}" = "__UNSET__" ] && echo "ok - S3: command-form snapshot left the session shell free of override var
+iables" || echo "NOT-OK - S3: command-form snapshot left meta=[${FM_CREW_STATE_META_OVERRIDE-__UNSET__}] status=[${FM_CREW_STATE_STATUS_OVERRIDE-__UNSET__}]" ; echo __MK39__ $?
+ok - S3: command-form snapshot left the session shell free of override variables
+__MK39__ 0
+bash-3.2$ echo "S3-LIVE-STATUS-REWRITE (simulating another agent updating the live status log):" ; echo __MK40__ $?
+S3-LIVE-STATUS-REWRITE (simulating another agent updating the live status log):
+__MK40__ 0
+bash-3.2$ printf "blocked: live-path-proof\n" > "$FM_HOME/state/leaktask.status" ; echo __MK41__ $?
+__MK41__ 0
+bash-3.2$ echo "S3-LATER-READ (later crew-state call must resolve live state, not stale captured):" ; echo __MK42__ $?
+S3-LATER-READ (later crew-state call must resolve live state, not stale captured):
+__MK42__ 0
+bash-3.2$ /Users/adedase/.no-mistakes/worktrees/527df5d885a5/01M5KXBEMGNCKZK289WMESYWAM/bin/fm-crew-state.sh leaktask ; echo __MK43__ $?
+state: blocked · source: status-log · live-path-proof
+__MK43__ 0
+bash-3.2$ [ "$("/Users/adedase/.no-mistakes/worktrees/527df5d885a5/01M5KXBEMGNCKZK289WMESYWAM/bin/fm-crew-state.sh" leaktask)" = "state: blocked $(printf '\302\267') source: status-log $(printf '\302\267') live-path-proo
+f" ] && echo "ok - S3: later crew-state calls read the live status log after the snapshot" || echo "NOT-OK - S3: later read resolved stale state" ; echo __MK44__ $?
+ok - S3: later crew-state calls read the live status log after the snapshot
+__MK44__ 0
+bash-3.2$ echo "S3-SOURCED-FORM (snapshot sourced into the session shell):" ; echo __MK45__ $?
+S3-SOURCED-FORM (snapshot sourced into the session shell):
+__MK45__ 0
+bash-3.2$ . /Users/adedase/.no-mistakes/worktrees/527df5d885a5/01M5KXBEMGNCKZK289WMESYWAM/bin/fm-fleet-snapshot.sh --json > "$FM_HOME/s3-sourced.json"; printf "S3-SOURCED-RC=%s\n" "$?" ; echo __MK46__ $?
+[1]+  Done                    prefetch_task_observations "$meta" "$id"
+S3-SOURCED-RC=0
+__MK46__ 0
+bash-3.2$ printf "S3-AFTER-SOURCED meta=[%s] status=[%s]\n" "${FM_CREW_STATE_META_OVERRIDE-__UNSET__}" "${FM_CREW_STATE_STATUS_OVERRIDE-__UNSET__}" ; echo __MK47__ $?
+S3-AFTER-SOURCED meta=[__UNSET__] status=[__UNSET__]
+__MK47__ 0
+bash-3.2$ n=$(env | grep -c "^FM_CREW_STATE_.*OVERRIDE=" || true); printf "S3-AFTER-SOURCED-OVERRIDE-VAR-COUNT=%s\n" "$n" ; echo __MK48__ $?
+S3-AFTER-SOURCED-OVERRIDE-VAR-COUNT=0
+__MK48__ 0
+bash-3.2$ [ "${FM_CREW_STATE_META_OVERRIDE-__UNSET__}" = "__UNSET__" ] && [ "${FM_CREW_STATE_STATUS_OVERRIDE-__UNSET__}" = "__UNSET__" ] && echo "ok - S3: sourced snapshot left the session shell free of override variable
+s" || echo "NOT-OK - S3: sourced snapshot left meta=[${FM_CREW_STATE_META_OVERRIDE-__UNSET__}] status=[${FM_CREW_STATE_STATUS_OVERRIDE-__UNSET__}]" ; echo __MK49__ $?
+ok - S3: sourced snapshot left the session shell free of override variables
+__MK49__ 0
+bash-3.2$ printf "needs-decision: sourced-form-proof\n" > "$FM_HOME/state/leaktask.status" ; echo __MK50__ $?
+__MK50__ 0
+bash-3.2$ echo "S3-SOURCED-LATER-READ:" ; echo __MK51__ $?
+S3-SOURCED-LATER-READ:
+__MK51__ 0
+bash-3.2$ /Users/adedase/.no-mistakes/worktrees/527df5d885a5/01M5KXBEMGNCKZK289WMESYWAM/bin/fm-crew-state.sh leaktask ; echo __MK52__ $?
+state: parked · source: status-log · sourced-form-proof
+__MK52__ 0
+bash-3.2$ echo "S3-ADVERSARIAL-POISON (stale ambient overrides exported deliberately after the run):" ; echo __MK53__ $?
+S3-ADVERSARIAL-POISON (stale ambient overrides exported deliberately after the run):
+__MK53__ 0
+bash-3.2$ export FM_CREW_STATE_META_OVERRIDE="$FM_HOME/captured-1/leaktask.meta" FM_CREW_STATE_STATUS_OVERRIDE="$FM_HOME/captured-2/leaktask.status" ; echo __MK54__ $?
+__MK54__ 0
+bash-3.2$ printf "working: poison-block-live-read\n" > "$FM_HOME/state/leaktask.status" ; echo __MK55__ $?
+__MK55__ 0
+bash-3.2$ /Users/adedase/.no-mistakes/worktrees/527df5d885a5/01M5KXBEMGNCKZK289WMESYWAM/bin/fm-fleet-snapshot.sh --json > "$FM_HOME/s3-poison.json"; printf "S3-POISON-SNAPSHOT-RC=%s\n" "$?" ; echo __MK56__ $?
+S3-POISON-SNAPSHOT-RC=0
+__MK56__ 0
+bash-3.2$ jq -e '.tasks[]|select(.id=="leaktask")|(.current_state.state=="working" and .current_state.source=="status-log" and .current_state.detail=="poison-block-live-read")' "$FM_HOME/s3-poison.json" >/dev/null && ech
+o "ok - S3: snapshot child read live state even with deliberately poisoned ambient overrides" || echo "NOT-OK - S3: poisoned ambient overrides corrupted the snapshot read" ; echo __MK57__ $?
+ok - S3: snapshot child read live state even with deliberately poisoned ambient overrides
+__MK57__ 0
+bash-3.2$ unset FM_CREW_STATE_META_OVERRIDE FM_CREW_STATE_STATUS_OVERRIDE ; echo __MK58__ $?
+__MK58__ 0
+bash-3.2$ n=$(env | grep -c "^FM_CREW_STATE_.*OVERRIDE=" || true); printf "S3-FINAL-OVERRIDE-VAR-COUNT=%s\n" "$n" ; echo __MK59__ $?
+S3-FINAL-OVERRIDE-VAR-COUNT=0
+__MK59__ 0
+bash-3.2$ echo "S3-FINAL-DEFAULT-READ:" ; echo __MK60__ $?
+S3-FINAL-DEFAULT-READ:
+__MK60__ 0
+bash-3.2$ /Users/adedase/.no-mistakes/worktrees/527df5d885a5/01M5KXBEMGNCKZK289WMESYWAM/bin/fm-crew-state.sh leaktask ; echo __MK61__ $?
+state: working · source: status-log · poison-block-live-read
+__MK61__ 0
+bash-3.2$

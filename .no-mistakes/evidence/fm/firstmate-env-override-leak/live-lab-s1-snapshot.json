@@ -1,0 +1,239 @@
+{
+  "schema": "fm-fleet-snapshot.v1",
+  "generated": "2026-10-23T08:41:52Z",
+  "fm_home": "/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T//fm-lab.m6CXJt",
+  "roots": {
+    "fm_root": "/Users/adedase/.no-mistakes/worktrees/527df5d885a5/01M5KXBEMGNCKZK289WMESYWAM",
+    "state": "/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T//fm-lab.m6CXJt/state",
+    "data": "/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T//fm-lab.m6CXJt/data",
+    "config": "/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T//fm-lab.m6CXJt/config",
+    "projects": "/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T//fm-lab.m6CXJt/projects"
+  },
+  "backlog": {
+    "path": "/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T//fm-lab.m6CXJt/data/backlog.md",
+    "present": true,
+    "records": [
+      {
+        "since": "2026-07-07",
+        "blocked_reason": null,
+        "id": "leaktask",
+        "checked": false,
+        "hold_age_days": 108,
+        "completion": {
+          "date": null,
+          "verb": null
+        },
+        "hold_bucket": null,
+        "title": "Leak Task /var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T//fm-lab.m6CXJt/data/leaktask/report.md",
+        "hold_reason": null,
+        "report_path": "data/leaktask/report.md",
+        "body_excerpt": null,
+        "priority": null,
+        "raw": "- [ ] leaktask - Leak Task /var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T//fm-lab.m6CXJt/data/leaktask/report.md (repo: alpha) (kind: scout) (since 2026-07-07)",
+        "order": 1,
+        "hold_set": null,
+        "unresolved_blocker_ids": [],
+        "kind": "scout",
+        "structured": true,
+        "captain_actionable": false,
+        "state": "in_flight",
+        "merged": null,
+        "current_role": "worker",
+        "hold_kind": null,
+        "local_note": null,
+        "done": null,
+        "requires_child_metadata": true,
+        "reported": null,
+        "blocked_by_ids": [],
+        "pr_url": null,
+        "links": [],
+        "hold_until": null,
+        "body_lines": [],
+        "blocked_by": null,
+        "repo": "alpha"
+      }
+    ]
+  },
+  "tasks": [
+    {
+      "id": "leaktask",
+      "kind": "scout",
+      "harness": "claude",
+      "mode": "scout",
+      "yolo": "off",
+      "branch": null,
+      "project": "alpha",
+      "spawn_gen": null,
+      "backend": "tmux",
+      "remote": null,
+      "paths": {
+        "meta": {
+          "path": "/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T//fm-lab.m6CXJt/state/leaktask.meta",
+          "present": true
+        },
+        "status_log": {
+          "path": "/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T//fm-lab.m6CXJt/state/leaktask.status",
+          "present": true,
+          "kind": "event_history",
+          "last_event": {
+            "state": "working",
+            "note": "live status from the lab",
+            "raw": "working: live status from the lab",
+            "age_seconds": null
+          }
+        },
+        "worktree": {
+          "path": "/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T//fm-lab.m6CXJt/projects/leaktask-wt",
+          "present": true
+        },
+        "home": {
+          "path": null,
+          "present": false
+        },
+        "report": {
+          "path": "/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T//fm-lab.m6CXJt/data/leaktask/report.md",
+          "present": true
+        }
+      },
+      "secondmate_projects": [],
+      "current_state": {
+        "state": "working",
+        "source": "status-log",
+        "detail": "live status from the lab",
+        "raw": "state: working · source: status-log · live status from the lab",
+        "observed_at": "2026-10-23T08:41:52Z",
+        "freshness": "fresh"
+      },
+      "endpoint": {
+        "target": "firstmate:fm-leaktask",
+        "exists": true,
+        "agent_alive": "not_checked",
+        "status": "unknown",
+        "observed_at": "2026-10-23T08:41:52Z",
+        "freshness": "fresh"
+      },
+      "pr": {
+        "url": null,
+        "source": "absent",
+        "head": null
+      },
+      "hints": {
+        "pending_decision": false,
+        "blocked_event": false,
+        "open_decisions": [],
+        "scout_report_present": true,
+        "last_event_text": "working: live status from the lab"
+      },
+      "actions": {
+        "watch": "bin/fm-peek.sh fm-leaktask",
+        "steer": "bin/fm-send.sh fm-leaktask '<instruction>'",
+        "return_channel_note": null
+      },
+      "backlog": {
+        "since": "2026-07-07",
+        "blocked_reason": null,
+        "id": "leaktask",
+        "checked": false,
+        "hold_age_days": 108,
+        "completion": {
+          "date": null,
+          "verb": null
+        },
+        "hold_bucket": null,
+        "title": "Leak Task /var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T//fm-lab.m6CXJt/data/leaktask/report.md",
+        "hold_reason": null,
+        "report_path": "data/leaktask/report.md",
+        "body_excerpt": null,
+        "priority": null,
+        "raw": "- [ ] leaktask - Leak Task /var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T//fm-lab.m6CXJt/data/leaktask/report.md (repo: alpha) (kind: scout) (since 2026-07-07)",
+        "order": 1,
+        "hold_set": null,
+        "unresolved_blocker_ids": [],
+        "kind": "scout",
+        "structured": true,
+        "captain_actionable": false,
+        "state": "in_flight",
+        "merged": null,
+        "current_role": "worker",
+        "hold_kind": null,
+        "local_note": null,
+        "done": null,
+        "requires_child_metadata": true,
+        "reported": null,
+        "blocked_by_ids": [],
+        "pr_url": null,
+        "links": [],
+        "hold_until": null,
+        "body_lines": [],
+        "blocked_by": null,
+        "repo": "alpha"
+      }
+    }
+  ],
+  "main_inventory": {
+    "valid": true,
+    "reason": null,
+    "orphan_in_flight": [],
+    "unstructured_current_count": 0
+  },
+  "contributions": {
+    "known": 0,
+    "checked": 0,
+    "counts": {
+      "captain": 0,
+      "fleet": 0,
+      "maintainer": 0,
+      "nobody": 0
+    },
+    "unmeasured": 0,
+    "complete": true,
+    "proven_clear": true,
+    "stale_verdicts": 0,
+    "missing_verdicts": 0,
+    "unreadable_records": 0,
+    "valid_until": 900,
+    "captain": [],
+    "captain_omitted": 0
+  },
+  "scout_reports": [
+    {
+      "id": "leaktask",
+      "path": "/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T//fm-lab.m6CXJt/data/leaktask/report.md",
+      "kind": "scout"
+    }
+  ],
+  "secondmate_current": {
+    "registry": {
+      "present": false,
+      "available": true,
+      "complete": true,
+      "reason": null,
+      "provenance": "registered-table",
+      "path": "/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T//fm-lab.m6CXJt/data/secondmates.md",
+      "freshness": {
+        "status": "fresh",
+        "observed_at": "2026-10-23T08:41:52Z"
+      },
+      "records": [],
+      "input_truncated": false,
+      "records_truncated": false,
+      "reasons": [],
+      "lines_in_window": 0,
+      "records_in_window": 0
+    },
+    "records": [],
+    "total_registered": 0,
+    "total": 0,
+    "shown": 0,
+    "truncated": 0
+  },
+  "secondmate_landed": {
+    "records": [],
+    "truncated": [],
+    "unreadable": [],
+    "partial": []
+  },
+  "secondmate_guidance": {
+    "note": "For kind=secondmate, bearings selects validated structured state from that registered home; parent events and bounded terminal evidence are fallback-only supplements and never current-state authority."
+  }
+}

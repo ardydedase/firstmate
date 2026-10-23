@@ -1,0 +1,75 @@
+
+The default interactive shell is now zsh.
+To update your account to use zsh, please run `chsh -s /bin/zsh`.
+For more details, please visit https://support.apple.com/kb/HT208050.
+bash-3.2$ printf "S1-ENTRY meta=[%s] status=[%s] fmhome=[%s]\n" "${FM_CREW_STATE_META_OVERRIDE-__UNSET__}" "${FM_CREW_STATE_STATUS_OVERRIDE-__UNSET__}" "$FM_HOME" ; echo __MK1__ $?
+S1-ENTRY meta=[/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T//fm-lab.m6CXJt/captured-1/leaktask.meta] status=[__UNSET__] fmhome=[/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T//fm-lab.m6CXJt]
+__MK1__ 0
+bash-3.2$ n=$(env | grep -c "^FM_CREW_STATE_.*OVERRIDE=" || true); printf "S1-OVERRIDE-VAR-COUNT=%s\n" "$n" ; echo __MK2__ $?
+S1-OVERRIDE-VAR-COUNT=1
+__MK2__ 0
+bash-3.2$ echo "S1-CONTROL-READ (override removed for this child only):" ; echo __MK3__ $?
+S1-CONTROL-READ (override removed for this child only):
+__MK3__ 0
+bash-3.2$ env -u FM_CREW_STATE_META_OVERRIDE /Users/adedase/.no-mistakes/worktrees/527df5d885a5/01M5KXBEMGNCKZK289WMESYWAM/bin/fm-crew-state.sh leaktask ; echo __MK4__ $?
+state: working · source: status-log · live status from the lab
+__MK4__ 0
+bash-3.2$ echo "S1-OVERRIDE-READ (parent override honored):" ; echo __MK5__ $?
+S1-OVERRIDE-READ (parent override honored):
+__MK5__ 0
+bash-3.2$ /Users/adedase/.no-mistakes/worktrees/527df5d885a5/01M5KXBEMGNCKZK289WMESYWAM/bin/fm-crew-state.sh leaktask ; echo __MK6__ $?
+state: unknown · source: none · worktree gone (torn down?)
+__MK6__ 0
+bash-3.2$ /Users/adedase/.no-mistakes/worktrees/527df5d885a5/01M5KXBEMGNCKZK289WMESYWAM/bin/fm-fleet-snapshot.sh --json > "$FM_HOME/s1.json"; printf "S1-SNAPSHOT-RC=%s\n" "$?" ; echo __MK7__ $?
+S1-SNAPSHOT-RC=0
+__MK7__ 0
+bash-3.2$ printf "S1-AFTER meta=[%s] status=[%s]\n" "${FM_CREW_STATE_META_OVERRIDE-__UNSET__}" "${FM_CREW_STATE_STATUS_OVERRIDE-__UNSET__}" ; echo __MK8__ $?
+S1-AFTER meta=[/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T//fm-lab.m6CXJt/captured-1/leaktask.meta] status=[__UNSET__]
+__MK8__ 0
+bash-3.2$ n=$(env | grep -c "^FM_CREW_STATE_.*OVERRIDE=" || true); printf "S1-AFTER-OVERRIDE-VAR-COUNT=%s\n" "$n" ; echo __MK9__ $?
+S1-AFTER-OVERRIDE-VAR-COUNT=1
+__MK9__ 0
+bash-3.2$ [ "${FM_CREW_STATE_META_OVERRIDE-__X__}" = "$FM_HOME/captured-1/leaktask.meta" ] && echo "ok - S1: session shell keeps exactly the parent-set meta override - no captured-path leak" || echo "NOT-OK - S1: meta en
+v is [${FM_CREW_STATE_META_OVERRIDE-__UNSET__}]" ; echo __MK10__ $?
+ok - S1: session shell keeps exactly the parent-set meta override - no captured-path leak
+__MK10__ 0
+bash-3.2$ [ -z "${FM_CREW_STATE_STATUS_OVERRIDE+Z}" ] && echo "ok - S1: status override never materialized in the session shell" || echo "NOT-OK - S1: status override materialized [${FM_CREW_STATE_STATUS_OVERRIDE}]" ; ec
+ho __MK11__ $?
+ok - S1: status override never materialized in the session shell
+__MK11__ 0
+bash-3.2$ jq -e '.tasks[]|select(.id=="leaktask")|(.current_state.state=="working" and .current_state.source=="status-log" and .current_state.detail=="live status from the lab" and .endpoint.exists==true)' "$FM_HOME/s1.j
+son" >/dev/null && echo "ok - S1: snapshot child read the live crew state despite the ambient meta override" || echo "NOT-OK - S1: snapshot child read polluted by ambient override" ; echo __MK12__ $?
+ok - S1: snapshot child read the live crew state despite the ambient meta override
+__MK12__ 0
+bash-3.2$ echo "S1-REPEAT-READ (still the parent override after the snapshot):" ; echo __MK13__ $?
+S1-REPEAT-READ (still the parent override after the snapshot):
+__MK13__ 0
+bash-3.2$ /Users/adedase/.no-mistakes/worktrees/527df5d885a5/01M5KXBEMGNCKZK289WMESYWAM/bin/fm-crew-state.sh leaktask ; echo __MK14__ $?
+state: unknown · source: none · worktree gone (torn down?)
+__MK14__ 0
+bash-3.2$ /Users/adedase/.no-mistakes/worktrees/527df5d885a5/01M5KXBEMGNCKZK289WMESYWAM/bin/fm-fleet-view.sh > "$FM_HOME/s1-view.txt" 2>&1; printf "S1-VIEW-RC=%s\n" "$?" ; echo __MK15__ $?
+S1-VIEW-RC=0
+__MK15__ 0
+bash-3.2$ sed -n "1,18p" "$FM_HOME/s1-view.txt"; echo "S1-VIEW-SHOWN" ; echo __MK16__ $?
+# Fleet View
+
+Schema: fm-fleet-snapshot.v1
+Home: /var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T//fm-lab.m6CXJt
+
+## Under Way
+| ID | Current | Kind | Repo/Project | Backend | Endpoint | Artifact | Path | Watch / return channel |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| leaktask | working / status-log | scout | alpha | tmux | present | /var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T//fm-lab.m6CXJt/data/leaktask/report.md | /var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T//fm-lab.m6CX
+Jt/projects/leaktask-wt | bin/fm-peek.sh fm-leaktask |
+
+## Queued
+No queued backlog records found.
+
+## Done
+No done backlog records found.
+
+## Secondmates
+For kind=secondmate, bearings selects validated structured state from that registered home; parent events and bounded terminal evidence are fallback-only supplements and never current-state authority.
+S1-VIEW-SHOWN
+__MK16__ 0
+bash-3.2$
