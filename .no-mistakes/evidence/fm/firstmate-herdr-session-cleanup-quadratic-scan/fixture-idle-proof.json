@@ -1,0 +1,2 @@
+{"id":"cli:pane:process_info","result":{"process_info":{"foreground_process_group_id":61064,"foreground_processes":[{"argv":["-zsh"],"argv0":"zsh","cmdline":"-zsh","cwd":"/Users/adedase","name":"zsh","pid":61064}],"pane_id":"w15:p1","shell_pid":61064},"type":"pane_process_info"}}
+{"shell":37176,"procs":["printf %s\\n darwin","-zsh","-zsh"]}

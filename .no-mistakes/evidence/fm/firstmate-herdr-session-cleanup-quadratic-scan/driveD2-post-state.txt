@@ -1,0 +1,16 @@
+== state is:
+drwxr-xr-x@    3 adedase  staff      96 Oct 23 18:35 outside-state
+lrwxr-xr-x@    1 adedase  staff      77 Oct 23 18:38 state -> /var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T//fm-lab.8t23lF/outside-state
+drwxr-xr-x@   83 adedase  staff    2656 Oct 23 18:38 state.preserved-d
+== external journal:
+version=1
+task_id=stale-alive
+projection_id=<LIVETOK>
+== external journal unchanged (diff vs pre-drive copy):
+BYTE-IDENTICAL: not deleted, untouched
+== preserved real state journals:
+      65
+== pane still alive:
+["-zsh"]
+== workspace count:
+35

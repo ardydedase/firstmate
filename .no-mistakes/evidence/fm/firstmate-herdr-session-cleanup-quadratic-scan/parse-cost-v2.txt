@@ -1,0 +1,1 @@
+10 parses: 2.27s => 0.227 s/parse

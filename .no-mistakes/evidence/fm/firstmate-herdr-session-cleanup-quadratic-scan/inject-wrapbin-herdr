@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Injection wrapper for adversarial drives C (dup journal) and D (state-dir
+# symlink swap). Single-shot: acts once, on the first `api snapshot` call,
+# then passes every call (including that one) to the real herdr unchanged.
+# FM_LAB_INJECT_DIR is the lab home ($LAB); its `state` subdir is the cleanup
+# scan target.
+REAL=/Users/adedase/.local/bin/herdr
+INJECT_DIR=${FM_LAB_INJECT_DIR:-}
+case "$*" in
+*"api snapshot"*)
+  if [ -n "$INJECT_DIR" ] && [ -e "$INJECT_DIR/armed" ]; then
+    mode=$(cat "$INJECT_DIR/armed" 2>/dev/null || true)
+    rm -f "$INJECT_DIR/armed"
+    case "$mode" in
+    dup)
+      printf 'version=1\ntask_id=fm-stale-alive\nprojection_id=%s\n' \
+        "$LAB_INJECT_TOK" \
+        > "$INJECT_DIR/state/fm-stale-alive.herdr-presentation"
+      ;;
+    swapstate)
+      mv "$INJECT_DIR/state" "$INJECT_DIR/state.preserved-d" \
+        && ln -s "$INJECT_DIR/outside-state" "$INJECT_DIR/state"
+      ;;
+    esac
+  fi
+  ;;
+esac
+exec "$REAL" "$@"

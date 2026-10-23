@@ -1,0 +1,5 @@
+1792755305 call: workspace list --session fm-lab-qsmoke-83619-9665
+1792755329 call: session list --json --session fm-lab-qsmoke-83619-9665
+1792755329 call: api snapshot --session fm-lab-qsmoke-83619-9665
+1792755329 injected: swapstate
+1792755329 call: pane get w16:p1 --session fm-lab-qsmoke-83619-9665

@@ -1,0 +1,3 @@
+journals=      66 dup=present stale=present
+["-zsh"]
+35
