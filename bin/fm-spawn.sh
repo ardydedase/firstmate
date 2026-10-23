@@ -6597,6 +6597,11 @@ if [ "$SPAWN_META_LOCK_HELD" != 1 ]; then
 fi
 if [ "$RELAUNCH" -eq 1 ]; then
   SPAWN_META_TMP="$STATE/.$ID.meta.relaunch.${BASHPID:-$$}"
+  if ! rm -f -- "$SPAWN_META_TMP" ||
+    ! (umask 077 && : >"$SPAWN_META_TMP"); then
+    echo "error: replacement task record for $ID could not be staged privately at $SPAWN_META_TMP" >&2
+    exit 1
+  fi
 else
   SPAWN_META_TMP="$STATE/.$ID.meta.spawn.${BASHPID:-$$}"
   SPAWN_FRESH_COMMIT_PENDING=1
