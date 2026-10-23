@@ -282,6 +282,44 @@ reset_fixture; : > "$FIXTURE_DIR/race"; assert_preserved "revalidation race"
 reset_fixture; printf '%s\n' "$TAB" > "$FIXTURE_DIR/active-tab"; assert_preserved "active target"
 reset_fixture; : > "$FIXTURE_DIR/focus-refuse"; assert_preserved "focus refusal"
 
+# Candidate discovery must parse each home-local journal exactly once per
+# cleanup pass however many grammar-matching candidate workspaces exist.
+# Wrapping the journal snapshot backend function counts parses through the
+# public data path without touching its validated semantics.
+eval "$(declare -f fm_backend_herdr_projection_journal_snapshot \
+  | sed '1s/^fm_backend_herdr_projection_journal_snapshot/_cleanup_journal_parse_real/')"
+_parse_calls=0
+fm_backend_herdr_projection_journal_snapshot() {
+  _parse_calls=$((_parse_calls + 1))
+  _cleanup_journal_parse_real "$@"
+}
+rm -f "${FM_STATE_OVERRIDE:?}"/*herdr-presentation
+write_v1 probe-a ZzZzZzZzZzZzZzZzZzZzA0
+write_v1 probe-b ZzZzZzZzZzZzZzZzZzZzB0
+write_v1 probe-c ZzZzZzZzZzZzZzZzZzZzC0
+write_v1 probe-d ZzZzZzZzZzZzZzZzZzZzD0
+fm_backend_herdr_cli() {
+  local _session=$1; shift
+  [ "${1:-} ${2:-}" = "workspace list" ] || return 1
+  printf '%s\n' '{"result":{"workspaces":['
+  printf '%s\n' '{"workspace_id":"w1","label":"firstmate","focused":true,"active_tab_id":"w1:t1","tab_count":1,"pane_count":1},'
+  printf '%s\n' '{"workspace_id":"wx1","label":"└ sonar-1 · p:Sonar0000000000000000A","focused":false,"active_tab_id":"wx1:t1","tab_count":1,"pane_count":1},'
+  printf '%s\n' '{"workspace_id":"wx2","label":"└ sonar-2 · p:Sonar0000000000000000B","focused":false,"active_tab_id":"wx2:t1","tab_count":1,"pane_count":1},'
+  printf '%s\n' '{"workspace_id":"wx3","label":"└ sonar-3 · p:Sonar0000000000000000C","focused":false,"active_tab_id":"wx3:t1","tab_count":1,"pane_count":1},'
+  printf '%s\n' '{"workspace_id":"wx4","label":"└ sonar-4 · p:Sonar0000000000000000D","focused":false,"active_tab_id":"wx4:t1","tab_count":1,"pane_count":1}]}}'
+}
+_parse_calls=0
+fm_herdr_session_cleanup >/dev/null 2>&1
+_journals_left=0
+for _journal in "${FM_STATE_OVERRIDE:?}"/*herdr-presentation; do
+  [ -f "$_journal" ] && _journals_left=$((_journals_left + 1))
+done
+[ "$_journals_left" = 4 ] \
+  || fail "parse-count probe pass removed journals"
+[ "$_parse_calls" = 4 ] \
+  || fail "candidate discovery parsed journals per candidate ($_parse_calls) instead of once per pass"
+pass "four grammar candidates parse four journals exactly once per pass"
+
 INTEGRATION_ROOT="$TMP_ROOT/bootstrap-integration"
 mkdir -p "$INTEGRATION_ROOT/home/state" "$INTEGRATION_ROOT/home/data" "$INTEGRATION_ROOT/home/config"
 cp -R "$ROOT/bin" "$INTEGRATION_ROOT/bin"

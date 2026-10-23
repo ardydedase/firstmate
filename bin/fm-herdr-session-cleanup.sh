@@ -15,6 +15,8 @@
 # one pane, absent task metadata, no registered agent, and a process proof that
 # the pane contains only one idle recognized shell with no child process. A
 # version 2 journal must also bind the exact workspace, tab, and pane.
+# Every home-local journal is parsed once per cleanup pass into a title-keyed
+# index used for candidate discovery; the mutation guards re-read live state.
 # Topology is first checked from one locked API snapshot, then every mutation
 # prerequisite is immediately rechecked before the existing exact-pane
 # focus-preserving close helper is called.
@@ -62,20 +64,31 @@ fm_herdr_cleanup_home_identity() {
   (cd "$FM_HOME" 2>/dev/null && pwd -P)
 }
 
+# One journal parse per cleanup pass: every candidate journal is snapshotted
+# once into a title-keyed in-memory index, and each candidate workspace
+# matches against that index instead of rescanning every journal per workspace.
+# A matched record's journal is existence-tested at lookup time so mid-pass
+# removals stay visible; content drift after the index build is still caught
+# by the live revalidation and post-closure rechecks, which re-read files.
+fm_herdr_cleanup_journal_validate() { # <journal> <id> <session> <home-real>
+  local journal=$1 id=$2 session=$3 home_real=$4 journal_home
+  fm_backend_herdr_projection_journal_snapshot "$journal" "$id" || return 1
+  if [ "$FM_BACKEND_HERDR_JOURNAL_VERSION" = 2 ]; then
+    journal_home=$(fm_backend_herdr_projection_home_identity \
+      "$FM_BACKEND_HERDR_JOURNAL_HOME" 2>/dev/null) || return 1
+    [ "$journal_home" = "$home_real" ] \
+      && [ "$FM_BACKEND_HERDR_JOURNAL_SESSION" = "$session" ] || return 1
+  fi
+}
+
 fm_herdr_cleanup_journal_matches() { # <title> <session> <home-real>
-  local title=$1 session=$2 home_real=$3 journal id expected journal_home
+  local title=$1 session=$2 home_real=$3 journal id expected
   [ -d "$STATE" ] && [ ! -L "$STATE" ] || return 1
   for journal in "$STATE"/*"$FM_BACKEND_HERDR_PRESENTATION_JOURNAL_SUFFIX"; do
     [ -f "$journal" ] && [ ! -L "$journal" ] || continue
     id=$(basename "$journal" "$FM_BACKEND_HERDR_PRESENTATION_JOURNAL_SUFFIX")
     fm_task_id_creation_valid "$id" || continue
-    fm_backend_herdr_projection_journal_snapshot "$journal" "$id" || continue
-    if [ "$FM_BACKEND_HERDR_JOURNAL_VERSION" = 2 ]; then
-      journal_home=$(fm_backend_herdr_projection_home_identity \
-        "$FM_BACKEND_HERDR_JOURNAL_HOME" 2>/dev/null) || continue
-      [ "$journal_home" = "$home_real" ] \
-        && [ "$FM_BACKEND_HERDR_JOURNAL_SESSION" = "$session" ] || continue
-    fi
+    fm_herdr_cleanup_journal_validate "$journal" "$id" "$session" "$home_real" || continue
     expected=$(fm_backend_herdr_projection_workspace_label \
       "$id" "$FM_BACKEND_HERDR_JOURNAL_PROJECTION_ID")
     [ "$expected" = "$title" ] || continue
@@ -112,6 +125,58 @@ fm_herdr_cleanup_unique_match() { # <title> <session> <home-real>
     FM_HERDR_CLEANUP_BOUND_TAB=$FM_BACKEND_HERDR_JOURNAL_TAB_ID
     FM_HERDR_CLEANUP_BOUND_PANE=$FM_BACKEND_HERDR_JOURNAL_PANE_ID
   fi
+}
+
+fm_herdr_cleanup_index_build() { # <session> <home-real>
+  local session=$1 home_real=$2 journal id label
+  FM_HERDR_CLEANUP_INDEX=
+  [ -d "$STATE" ] && [ ! -L "$STATE" ] || return 0
+  for journal in "$STATE"/*"$FM_BACKEND_HERDR_PRESENTATION_JOURNAL_SUFFIX"; do
+    [ -f "$journal" ] && [ ! -L "$journal" ] || continue
+    id=$(basename "$journal" "$FM_BACKEND_HERDR_PRESENTATION_JOURNAL_SUFFIX")
+    fm_task_id_creation_valid "$id" || continue
+    fm_herdr_cleanup_journal_validate "$journal" "$id" "$session" "$home_real" || continue
+    label=$(fm_backend_herdr_projection_workspace_label \
+      "$id" "$FM_BACKEND_HERDR_JOURNAL_PROJECTION_ID")
+    FM_HERDR_CLEANUP_INDEX+="$label"$'\t'"$journal"$'\t'"$id"$'\t'
+    FM_HERDR_CLEANUP_INDEX+="${FM_BACKEND_HERDR_JOURNAL_PROJECTION_ID}"$'\t'
+    FM_HERDR_CLEANUP_INDEX+="${FM_BACKEND_HERDR_JOURNAL_VERSION}"$'\t'
+    FM_HERDR_CLEANUP_INDEX+="${FM_BACKEND_HERDR_JOURNAL_WORKSPACE_ID}"$'\t'
+    FM_HERDR_CLEANUP_INDEX+="${FM_BACKEND_HERDR_JOURNAL_TAB_ID}"$'\t'
+    FM_HERDR_CLEANUP_INDEX+="${FM_BACKEND_HERDR_JOURNAL_PANE_ID}"$'\n'
+  done
+}
+
+fm_herdr_cleanup_index_match() { # <title> <session> <home-real>
+  local title=$1 session=$2 home_real=$3
+  local label journal id token version bound_workspace bound_tab bound_pane matches=0
+  FM_HERDR_CLEANUP_JOURNAL=
+  FM_HERDR_CLEANUP_ID=
+  FM_HERDR_CLEANUP_TOKEN=
+  FM_HERDR_CLEANUP_VERSION=
+  FM_HERDR_CLEANUP_BOUND_WORKSPACE=
+  FM_HERDR_CLEANUP_BOUND_TAB=
+  FM_HERDR_CLEANUP_BOUND_PANE=
+  if [ "${FM_HERDR_CLEANUP_INDEX_READY:-0}" != 1 ]; then
+    fm_herdr_cleanup_index_build "$session" "$home_real"
+    FM_HERDR_CLEANUP_INDEX_READY=1
+  fi
+  while IFS=$'\t' read -r label journal id token version bound_workspace bound_tab bound_pane; do
+    [ "$label" = "$title" ] || continue
+    [ -f "$journal" ] && [ ! -L "$journal" ] || continue
+    matches=$((matches + 1))
+    FM_HERDR_CLEANUP_JOURNAL=$journal
+    FM_HERDR_CLEANUP_ID=$id
+    FM_HERDR_CLEANUP_TOKEN=$token
+    FM_HERDR_CLEANUP_VERSION=$version
+    FM_HERDR_CLEANUP_BOUND_WORKSPACE=$bound_workspace
+    FM_HERDR_CLEANUP_BOUND_TAB=$bound_tab
+    FM_HERDR_CLEANUP_BOUND_PANE=$bound_pane
+  done <<< "$FM_HERDR_CLEANUP_INDEX"
+  [ "$matches" -eq 1 ] || return 1
+  [ -n "$FM_HERDR_CLEANUP_JOURNAL" ] \
+    && [ -n "$FM_HERDR_CLEANUP_ID" ] \
+    && [ -n "$FM_HERDR_CLEANUP_TOKEN" ] || return 1
 }
 
 fm_herdr_cleanup_snapshot_candidate() { # <snapshot> <workspace> <title> <token> <bound-workspace> <bound-tab> <bound-pane>
@@ -204,7 +269,7 @@ fm_herdr_cleanup_one() { # <session> <workspace> <title> <home-real>
   local version bound_workspace bound_tab bound_pane presentation_lock snapshot
   local tab pane state close_status=0
   token=$(fm_herdr_cleanup_title_token "$title") || return 0
-  if ! fm_herdr_cleanup_unique_match "$title" "$session" "$home_real"; then
+  if ! fm_herdr_cleanup_index_match "$title" "$session" "$home_real"; then
     return 0
   fi
   journal=$FM_HERDR_CLEANUP_JOURNAL
@@ -294,6 +359,8 @@ fm_herdr_cleanup_one() { # <session> <workspace> <title> <home-real>
 
 fm_herdr_session_cleanup() {
   local session home_real list candidates workspace title journal found=0
+  FM_HERDR_CLEANUP_INDEX=
+  FM_HERDR_CLEANUP_INDEX_READY=0
   [ -d "$STATE" ] && [ ! -L "$STATE" ] || return 0
   for journal in "$STATE"/*"$FM_BACKEND_HERDR_PRESENTATION_JOURNAL_SUFFIX"; do
     if [ -f "$journal" ] && [ ! -L "$journal" ]; then
