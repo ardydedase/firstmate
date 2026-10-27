@@ -1,0 +1,40 @@
+journals: 65
+workspaces: 35
+matching workspace present: 1
+focused workspace: captain-anchor
+workspace order:
+captain-anchor
+└ sonar-1 · p:sonar00000000000000001
+└ sonar-2 · p:sonar00000000000000002
+└ sonar-3 · p:sonar00000000000000003
+└ sonar-4 · p:sonar00000000000000004
+└ sonar-5 · p:sonar00000000000000005
+└ sonar-6 · p:sonar00000000000000006
+└ sonar-7 · p:sonar00000000000000007
+└ sonar-8 · p:sonar00000000000000008
+└ sonar-9 · p:sonar00000000000000009
+└ sonar-10 · p:sonar00000000000000010
+└ sonar-11 · p:sonar00000000000000011
+└ sonar-12 · p:sonar00000000000000012
+└ sonar-13 · p:sonar00000000000000013
+└ sonar-14 · p:sonar00000000000000014
+└ sonar-15 · p:sonar00000000000000015
+└ sonar-16 · p:sonar00000000000000016
+└ sonar-17 · p:sonar00000000000000017
+└ sonar-18 · p:sonar00000000000000018
+└ sonar-19 · p:sonar00000000000000019
+└ sonar-20 · p:sonar00000000000000020
+└ sonar-21 · p:sonar00000000000000021
+└ sonar-22 · p:sonar00000000000000022
+└ sonar-23 · p:sonar00000000000000023
+└ sonar-24 · p:sonar00000000000000024
+└ sonar-25 · p:sonar00000000000000025
+└ sonar-26 · p:sonar00000000000000026
+└ sonar-27 · p:sonar00000000000000027
+└ sonar-28 · p:sonar00000000000000028
+└ sonar-29 · p:sonar00000000000000029
+└ sonar-30 · p:sonar00000000000000030
+└ sonar-31 · p:sonar00000000000000031
+└ sonar-32 · p:sonar00000000000000032
+└ sonar-33 · p:sonar00000000000000033
+└ zz-restored-idle-shell · p:restored00000000000001
