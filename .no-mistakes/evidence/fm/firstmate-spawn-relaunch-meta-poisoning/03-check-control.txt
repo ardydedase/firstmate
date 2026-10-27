@@ -1,0 +1,15 @@
+=== CONTROL: base record minus the relaunch-appended rows ===
+meta: /Users/adedase/.no-mistakes/evidence/01M5XNXTTDP4G4HP70X8E6K8M0/03-meta-stripped-copy.txt
+IDENTITY-PARSE: PASS url=https://github.com/example/repo/pull/1914 provider=github
+PRIVACY: ok (mode 600 on state device)
+--- key row positions (line numbers) ---
+16:pr=https://github.com/example/repo/pull/1914
+17:pr_head=5c2b8e1f4a7d9b6c3e8f0a2d1b4c5e6f7a8b9c0d
+18:x_request=labv1-base-relay-77ad
+--- last 6 rows ---
+pr=https://github.com/example/repo/pull/1914
+pr_head=5c2b8e1f4a7d9b6c3e8f0a2d1b4c5e6f7a8b9c0d
+x_request=labv1-base-relay-77ad
+x_request_ts=1793072400
+x_followups=0
+x_platform=x

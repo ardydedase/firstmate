@@ -1,0 +1,21 @@
+=== POST-RELAUNCH healed record (target, valid fixture) ===
+meta: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-heal.meta
+IDENTITY-PARSE: PASS url=https://github.com/example/repo/pull/1913 provider=github
+PRIVACY: ok (mode 600 on state device)
+--- key row positions (line numbers) ---
+16:control_relaunch_tx=49387.20261027T035609Z.3459
+17:decisions_reviewed=1
+18:decision_keys=labv1-heal:1:origin/notes
+19:decisions_reviewed=1
+20:decision_keys=labv1-heal:2:origin/notes
+21:traceparent=00-8bdc57ccd8ef2b9b1a07af31a665989a-aa60cbc76037a94c-01
+22:pr=https://github.com/example/repo/pull/1913
+23:pr_head=7d1e5f0c9b8a7d6e5f4c3b2a1908d7c6b5a49381
+24:x_request=labv1-heal-relay-91bc
+--- last 6 rows ---
+pr=https://github.com/example/repo/pull/1913
+pr_head=7d1e5f0c9b8a7d6e5f4c3b2a1908d7c6b5a49381
+x_request=labv1-heal-relay-91bc
+x_request_ts=1793072400
+x_followups=0
+x_platform=x

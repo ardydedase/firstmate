@@ -1,0 +1,92 @@
+### kill the old lab's private tmux server and remove the old lab
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.d7A00V/state/labv1-prtail.git-hooks/pre-rebase: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.d7A00V/state/labv1-prtail.git-hooks/pre-applypatch: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.d7A00V/state/labv1-prtail.git-hooks/pre-auto-gc: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.d7A00V/state/labv1-prtail.git-hooks/pre-merge-commit: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.d7A00V/state/labv1-prtail.git-hooks/post-commit: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.d7A00V/state/labv1-prtail.git-hooks/sendemail-validate: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.d7A00V/state/labv1-prtail.git-hooks/applypatch-msg: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.d7A00V/state/labv1-prtail.git-hooks/prepare-commit-msg: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.d7A00V/state/labv1-prtail.git-hooks/post-checkout: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.d7A00V/state/labv1-prtail.git-hooks/post-applypatch: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.d7A00V/state/labv1-prtail.git-hooks/post-rewrite: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.d7A00V/state/labv1-prtail.git-hooks/commit-msg: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.d7A00V/state/labv1-prtail.git-hooks/pre-push: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.d7A00V/state/labv1-prtail.git-hooks/post-merge: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.d7A00V/state/labv1-prtail.git-hooks/pre-commit: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.d7A00V/state/labv1-prtail.git-hooks: Directory not empty
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.d7A00V/state: Directory not empty
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.d7A00V: Directory not empty
+### fresh lab (physical): /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W
+/private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W
+tmux server pid: 56282 (sessions: firstmate: 1 windows (created Tue Oct 27 10:49:28 2026))
+scaffolded: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/data/labv1-prtail/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})
+ok: added labv1-prtail (ship, repo notes) -> Queued
+task:
+  id: labv1-prtail
+  title: Live parked worker (PR-tail relaunch scenario)
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: ship
+  repo: notes
+  priority: "-"
+  created: 2026-10-27
+  closed: "-"
+  deps: none
+  links: none
+  body: ""
+help[2]:
+  - Run `tasks-axi start labv1-prtail` to move it to in flight
+  - Run `tasks-axi block labv1-prtail --by <other>` to record a dependency
+### spawn (permission mode auto, trace-context on)
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W
+spawned labv1-prtail harness=claude kind=ship mode=local-only yolo=on window=firstmate:fm-labv1-prtail worktree=/private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/treehouse/.treehouse/notes-e0f3a7/1/notes
+spawn rc=0 elapsed=41s
+window=firstmate:fm-labv1-prtail
+endpoint_task_id=labv1-prtail
+worktree=/private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/treehouse/.treehouse/notes-e0f3a7/1/notes
+project=/private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/projects/notes
+harness=claude
+approval_mode=auto
+kind=ship
+mode=local-only
+yolo=on
+branch=fm/labv1-prtail
+tasktmp=/tmp/fm-labv1-prtail
+model=sonnet
+effort=low
+busy_gen=g1793072996.70346.7360
+spawn_gen=s1793072999.57860.9557
+traceparent=00-63c8cc8e020c779cebfde5e04f52af3b-40e38e1defd2cd22-01
+### waiting for the worker's first parked turn (turn-ended marker)
+turn-ended after 32s: -rw-r--r--@ 1 adedase  staff  0 Oct 27 10:50 /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-prtail.turn-ended
+### status file:
+paused [at=1793073034]: parked; waiting for resume message, gate file /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/.gate-labv1-prtail
+### pane capture BEFORE relaunch:
+lab zsh
+fm-labv1-prtail 2.1.311
+      60 /Users/adedase/.no-mistakes/evidence/01M5XNXTTDP4G4HP70X8E6K8M0/01-pane-before.txt
+### arm the PR identity tail
+### product parser on the armed record (pre-relaunch)
+=== PRE-RELAUNCH armed record (target) ===
+meta: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-prtail.meta
+IDENTITY-PARSE: PASS url=https://github.com/example/repo/pull/1912 provider=github
+PRIVACY: ok (mode 600 on state device)
+--- key row positions (line numbers) ---
+16:traceparent=00-63c8cc8e020c779cebfde5e04f52af3b-40e38e1defd2cd22-01
+17:pr=https://github.com/example/repo/pull/1912
+18:pr_head=3f9c2a77b5e1d0a6c8b4e5f2a1b0c9d8e7f6a5b4
+19:x_request=labv1-prtail-relay-4f2a
+--- last 6 rows ---
+pr=https://github.com/example/repo/pull/1912
+pr_head=3f9c2a77b5e1d0a6c8b4e5f2a1b0c9d8e7f6a5b4
+x_request=labv1-prtail-relay-4f2a
+x_request_ts=1793072400
+x_followups=0
+x_platform=x
+### OK phase 1e complete

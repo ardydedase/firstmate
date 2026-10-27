@@ -1,0 +1,66 @@
+### relaunch (live, stop + respwan through the relaunch branch)
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+relaunched labv1-prtail harness=claude from=claude model=sonnet effort=low backend=tmux endpoint=firstmate:fm-labv1-prtail worktree=/private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/treehouse/.treehouse/notes-e0f3a7/1/notes
+relaunch rc=0 elapsed=41s
+### replacement record, verbatim
+window=firstmate:fm-labv1-prtail
+endpoint_task_id=labv1-prtail
+worktree=/private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/treehouse/.treehouse/notes-e0f3a7/1/notes
+project=/private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/projects/notes
+harness=claude
+approval_mode=auto
+kind=ship
+mode=local-only
+yolo=on
+branch=fm/labv1-prtail
+tasktmp=/tmp/fm-labv1-prtail
+model=sonnet
+effort=low
+busy_gen=g1793073091.9375.23128
+spawn_gen=s1793073093.4628.15674
+control_relaunch_tx=98244.20261027T035119Z.32184
+traceparent=00-63c8cc8e020c779cebfde5e04f52af3b-40e38e1defd2cd22-01
+pr=https://github.com/example/repo/pull/1912
+pr_head=3f9c2a77b5e1d0a6c8b4e5f2a1b0c9d8e7f6a5b4
+x_request=labv1-prtail-relay-4f2a
+x_request_ts=1793072400
+x_followups=0
+x_platform=x
+mode=-rw-------
+### product parser + ordering facts on the live replacement record
+=== POST-RELAUNCH record (target) ===
+meta: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-prtail.meta
+IDENTITY-PARSE: PASS url=https://github.com/example/repo/pull/1912 provider=github
+PRIVACY: ok (mode 600 on state device)
+--- key row positions (line numbers) ---
+16:control_relaunch_tx=98244.20261027T035119Z.32184
+17:traceparent=00-63c8cc8e020c779cebfde5e04f52af3b-40e38e1defd2cd22-01
+18:pr=https://github.com/example/repo/pull/1912
+19:pr_head=3f9c2a77b5e1d0a6c8b4e5f2a1b0c9d8e7f6a5b4
+20:x_request=labv1-prtail-relay-4f2a
+--- last 6 rows ---
+pr=https://github.com/example/repo/pull/1912
+pr_head=3f9c2a77b5e1d0a6c8b4e5f2a1b0c9d8e7f6a5b4
+x_request=labv1-prtail-relay-4f2a
+x_request_ts=1793072400
+x_followups=0
+x_platform=x
+### pane capture right after relaunch
+lab zsh
+fm-labv1-prtail 2.1.311
+### wait for the replacement agent's parked turn (new paused status line)
+replacement parked after 19s
+### status file:
+paused [at=1793073034]: parked; waiting for resume message, gate file /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/.gate-labv1-prtail
+paused [at=1793073125]: parked until gate file /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/.gate-labv1-prtail exists
+### final pane capture:
+      60 /Users/adedase/.no-mistakes/evidence/01M5XNXTTDP4G4HP70X8E6K8M0/01-pane-final.txt
+### OK phase 1f complete

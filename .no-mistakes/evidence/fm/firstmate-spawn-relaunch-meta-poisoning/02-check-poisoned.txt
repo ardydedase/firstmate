@@ -1,0 +1,21 @@
+=== PRE-RELAUNCH poisoned record (target, valid fixture) ===
+meta: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-heal.meta
+IDENTITY-PARSE: FAIL (fm_pr_metadata_identity_parse exit 1)
+PRIVACY: ok (mode 600 on state device)
+--- key row positions (line numbers) ---
+16:control_relaunch_tx=92042.20261027T035418Z.14278
+17:decisions_reviewed=1
+18:decision_keys=labv1-heal:1:origin/notes
+19:traceparent=00-8bdc57ccd8ef2b9b1a07af31a665989a-aa60cbc76037a94c-01
+20:pr=https://github.com/example/repo/pull/1913
+21:pr_head=7d1e5f0c9b8a7d6e5f4c3b2a1908d7c6b5a49381
+22:x_request=labv1-heal-relay-91bc
+26:decisions_reviewed=1
+27:decision_keys=labv1-heal:2:origin/notes
+--- last 6 rows ---
+x_request=labv1-heal-relay-91bc
+x_request_ts=1793072400
+x_followups=0
+x_platform=x
+decisions_reviewed=1
+decision_keys=labv1-heal:2:origin/notes

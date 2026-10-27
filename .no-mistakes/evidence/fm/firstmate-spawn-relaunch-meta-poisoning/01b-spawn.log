@@ -1,0 +1,29 @@
+### LAB physical: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.d7A00V
+### gate state: marker present, FM_HOME physical
+-rw-r--r--@ 1 adedase  staff  15 Oct 27 10:39 /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.d7A00V/.fm-lab-home
+### spawn (real claude ship worker into lab tmux)
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.d7A00V
+spawned labv1-prtail harness=claude kind=ship mode=local-only yolo=on window=firstmate:fm-labv1-prtail worktree=/private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.d7A00V/treehouse/.treehouse/notes-ccda8f/1/notes
+spawn rc=0 elapsed=47s
+### task record as the spawn wrote it
+window=firstmate:fm-labv1-prtail
+endpoint_task_id=labv1-prtail
+worktree=/private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.d7A00V/treehouse/.treehouse/notes-ccda8f/1/notes
+project=/private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.d7A00V/projects/notes
+harness=claude
+approval_mode=bypass
+kind=ship
+mode=local-only
+yolo=on
+branch=fm/labv1-prtail
+tasktmp=/tmp/fm-labv1-prtail
+model=sonnet
+effort=low
+busy_gen=g1793072446.47677.26501
+spawn_gen=s1793072449.28282.27303
+traceparent=00-bd917db387234812b28448bc1145e8c6-756551b4f9871bd2-01
+meta mode=-rw------- size=560
+windows:
+0 lab zsh
+1 fm-labv1-prtail 2.1.311
+### OK phase 1b complete

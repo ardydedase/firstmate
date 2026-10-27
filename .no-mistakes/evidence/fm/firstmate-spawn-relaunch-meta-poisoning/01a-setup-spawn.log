@@ -1,0 +1,36 @@
+### lab home: /var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T//fm-lab.d7A00V
+/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T//fm-lab.d7A00V
+marker: fm-lab-home v1
+### private tmux server (default socket name under lab-private TMUX_TMPDIR)
+tmux server pid: 4547
+firstmate: 1 windows (created Tue Oct 27 10:39:32 2026)
+### notes project (seed -> bare origin -> clone), registry row
+### brief + backlog row for labv1-prtail
+scaffolded: /var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T//fm-lab.d7A00V/data/labv1-prtail/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})
+8:Right after setup, append one paused status line naming the gate file /var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T//fm-lab.d7A00V/state/.gate-labv1-prtail and end your turn. Do not poll or sleep in a foreground command. When a later message resumes you, check that /var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T//fm-lab.d7A00V/state/.gate-labv1-prtail exists before doing anything; if it is absent, remain paused and end your turn again. Nothing else is in scope.
+ok: added labv1-prtail (ship, repo notes) -> Queued
+task:
+  id: labv1-prtail
+  title: Live parked worker (PR-tail relaunch scenario)
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: ship
+  repo: notes
+  priority: "-"
+  created: 2026-10-27
+  closed: "-"
+  deps: none
+  links: none
+  body: ""
+help[2]:
+  - Run `tasks-axi start labv1-prtail` to move it to in flight
+  - Run `tasks-axi block labv1-prtail --by <other>` to record a dependency
+### session trace-context state (models a primary session with trace-context on)
+### spawn (real claude ship worker, launched into the lab tmux)
+error: refusing fleet lifecycle from inside a no-mistakes gate worktree (/Users/adedase/.no-mistakes/repos/527df5d885a5.git)
+spawn rc=3 elapsed=2s

@@ -1,0 +1,109 @@
+### (1) repair the fixture pr_head row on the live record (39 -> 40 hex)
+pr_head rows repaired: 1
+=== 2b record after fixture repair (healed order + valid pr_head) ===
+meta: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-heal.meta
+IDENTITY-PARSE: PASS url=https://github.com/example/repo/pull/1913 provider=github
+PRIVACY: ok (mode 600 on state device)
+--- key row positions (line numbers) ---
+16:control_relaunch_tx=92042.20261027T035418Z.14278
+17:decisions_reviewed=1
+18:decision_keys=labv1-heal:1:origin/notes
+19:traceparent=00-8bdc57ccd8ef2b9b1a07af31a665989a-aa60cbc76037a94c-01
+20:pr=https://github.com/example/repo/pull/1913
+21:pr_head=7d1e5f0c9b8a7d6e5f4c3b2a1908d7c6b5a49381
+22:x_request=labv1-heal-relay-91bc
+--- last 6 rows ---
+pr=https://github.com/example/repo/pull/1913
+pr_head=7d1e5f0c9b8a7d6e5f4c3b2a1908d7c6b5a49381
+x_request=labv1-heal-relay-91bc
+x_request_ts=1793072400
+x_followups=0
+x_platform=x
+### (2) re-poison exactly as base captain-hold did (EOF append after tail)
+=== PRE-RELAUNCH poisoned record (target, valid fixture) ===
+meta: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-heal.meta
+IDENTITY-PARSE: FAIL (fm_pr_metadata_identity_parse exit 1)
+PRIVACY: ok (mode 600 on state device)
+--- key row positions (line numbers) ---
+16:control_relaunch_tx=92042.20261027T035418Z.14278
+17:decisions_reviewed=1
+18:decision_keys=labv1-heal:1:origin/notes
+19:traceparent=00-8bdc57ccd8ef2b9b1a07af31a665989a-aa60cbc76037a94c-01
+20:pr=https://github.com/example/repo/pull/1913
+21:pr_head=7d1e5f0c9b8a7d6e5f4c3b2a1908d7c6b5a49381
+22:x_request=labv1-heal-relay-91bc
+26:decisions_reviewed=1
+27:decision_keys=labv1-heal:2:origin/notes
+--- last 6 rows ---
+x_request=labv1-heal-relay-91bc
+x_request_ts=1793072400
+x_followups=0
+x_platform=x
+decisions_reviewed=1
+decision_keys=labv1-heal:2:origin/notes
+### (3) relaunch (live)
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+relaunched labv1-heal harness=claude from=claude model=sonnet effort=low backend=tmux endpoint=firstmate:fm-labv1-heal worktree=/private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/treehouse/.treehouse/notes-e0f3a7/2/notes
+relaunch rc=0 elapsed=54s
+### replacement record, verbatim
+window=firstmate:fm-labv1-heal
+endpoint_task_id=labv1-heal
+worktree=/private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/treehouse/.treehouse/notes-e0f3a7/2/notes
+project=/private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/projects/notes
+harness=claude
+approval_mode=auto
+kind=ship
+mode=local-only
+yolo=on
+branch=fm/labv1-heal
+tasktmp=/tmp/fm-labv1-heal
+model=sonnet
+effort=low
+busy_gen=g1793073386.72699.24722
+spawn_gen=s1793073390.59766.17093
+control_relaunch_tx=49387.20261027T035609Z.3459
+decisions_reviewed=1
+decision_keys=labv1-heal:1:origin/notes
+decisions_reviewed=1
+decision_keys=labv1-heal:2:origin/notes
+traceparent=00-8bdc57ccd8ef2b9b1a07af31a665989a-aa60cbc76037a94c-01
+pr=https://github.com/example/repo/pull/1913
+pr_head=7d1e5f0c9b8a7d6e5f4c3b2a1908d7c6b5a49381
+x_request=labv1-heal-relay-91bc
+x_request_ts=1793072400
+x_followups=0
+x_platform=x
+mode=-rw-------
+### product parser + ordering facts (expect HEAL: PASS)
+=== POST-RELAUNCH healed record (target, valid fixture) ===
+meta: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-heal.meta
+IDENTITY-PARSE: PASS url=https://github.com/example/repo/pull/1913 provider=github
+PRIVACY: ok (mode 600 on state device)
+--- key row positions (line numbers) ---
+16:control_relaunch_tx=49387.20261027T035609Z.3459
+17:decisions_reviewed=1
+18:decision_keys=labv1-heal:1:origin/notes
+19:decisions_reviewed=1
+20:decision_keys=labv1-heal:2:origin/notes
+21:traceparent=00-8bdc57ccd8ef2b9b1a07af31a665989a-aa60cbc76037a94c-01
+22:pr=https://github.com/example/repo/pull/1913
+23:pr_head=7d1e5f0c9b8a7d6e5f4c3b2a1908d7c6b5a49381
+24:x_request=labv1-heal-relay-91bc
+--- last 6 rows ---
+pr=https://github.com/example/repo/pull/1913
+pr_head=7d1e5f0c9b8a7d6e5f4c3b2a1908d7c6b5a49381
+x_request=labv1-heal-relay-91bc
+x_request_ts=1793072400
+x_followups=0
+x_platform=x
+### wait for the replacement agent's parked turn
+TIMEOUT waiting for replacement park
+replacement parked after 300s
+paused [at=1793073225]: parked, waiting for gate file /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/.gate-labv1-heal
+paused [at=1793073303]: parked until gate file /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/.gate-labv1-heal exists
+lab zsh
+fm-labv1-prtail 2.1.311
+fm-labv1-heal 2.1.311
+### OK phase 2c complete

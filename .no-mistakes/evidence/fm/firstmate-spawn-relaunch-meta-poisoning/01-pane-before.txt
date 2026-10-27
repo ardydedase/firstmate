@@ -1,0 +1,60 @@
+
+ ▐▛███▛█   Claude Code v2.1.311
+▝▜██████▀  Sonnet 5.5 with low effort · Claude Team
+ ▝▝   ▝▝   /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/treehouse/.treehouse/notes-e0f3a7/1/notes
+
+
+❯ : Firstmate operational input waiting: read '/private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/operational-inbox/1793073004-a83b4a4775fb7401.msg' and handle its contents as Firstmate
+  operational input.
+
+  Read 1 file, ran 2 shell commands
+
+⏺ I'm parked. I checked that this is the isolated worktree and created branch fm/labv1-prtail. I then appended a paused status line naming the gate file
+  /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/.gate-labv1-prtail.
+
+  When a later message resumes me, I'll check that the gate file exists before doing anything. If it's missing, I'll stay paused and end my turn again.
+
+✻ Cooked for 29s · done 10:50 AM
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+❯ 
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ⏵⏵ auto mode on (shift+tab to cycle)

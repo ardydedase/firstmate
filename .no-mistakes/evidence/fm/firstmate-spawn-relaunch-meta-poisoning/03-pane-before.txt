@@ -1,0 +1,60 @@
+
+ ▐▛███▛█   Claude Code v2.1.311
+▝▜██████▀  Sonnet 5.5 with low effort · Claude Team
+ ▝▝   ▝▝   /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/treehouse/.treehouse/notes-e0f3a7/3/notes
+
+
+❯ : Firstmate operational input waiting: read '/private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/operational-inbox/1793073840-3361ebc2f732e349.msg' and handle its contents as Firstmate
+  operational input.
+
+  Read 1 file, ran 1 shell command
+
+⏺ I'm parked on branch fm/labv1-base in the isolated worktree. I appended a paused status line naming the gate file .gate-labv1-base. When a later message resumes me, I'll check that the gate file exists before doing
+  anything. If it's absent, I'll stay paused.
+
+✻ Brewed for 17s · done 11:04 AM
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                      tmux focus-events off · add 'set -g focus-events on' to ~/.tmux.conf and reattach for focus tracking
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+❯ 
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ⏵⏵ auto mode on (shift+tab to cycle)

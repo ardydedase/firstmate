@@ -1,0 +1,41 @@
+### waiting for the worker's first turn to end (turn-ended marker)
+TIMEOUT waiting for turn-ended
+turn-ended after 301s: MISSING
+### status file (the worker's posted status lines)
+(no status file)
+### pane capture BEFORE relaunch (the real claude worker, parked)
+treehouse get
+➜  notes treehouse get
+A new version of treehouse is available: v2.3.0 → v3.1.6
+Run "treehouse update" to update
+
+🌳 Setting up worktree...
+🌳 Entered worktree at /var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.d7A00V/treehouse/.treehouse/notes-ccda8f/1/notes. Type 'exit' to return.
+cd -- '/private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.d7A00V/treehouse/.treehouse/notes-ccda8f/1/notes'
+➜  notes cd -- '/private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.d7A00V/treehouse/.treehouse/notes-ccda8f/1/notes'
+➜  notes git:(e494826) export GOTMPDIR=/tmp/fm-labv1-prtail/gotmp
+➜  notes git:(e494826) export COMPACT_ADVISER_DISABLE=1
+➜  notes git:(e494826) export FM_TASK_ID=labv1-prtail
+...(full capture: 01-pane-before.txt)
+lab zsh
+fm-labv1-prtail 2.1.311
+### seed the armed+x-linked tail (what fm-pr-check/fm-x-lib leave behind)
+armed meta mode=-rw-------
+### product parser on the armed record (pre-relaunch)
+=== PRE-RELAUNCH armed record (target) ===
+meta: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.d7A00V/state/labv1-prtail.meta
+IDENTITY-PARSE: PASS url=https://github.com/example/repo/pull/1912 provider=github
+PRIVACY: ok (mode 600 on state device)
+--- key row positions (line numbers) ---
+16:traceparent=00-bd917db387234812b28448bc1145e8c6-756551b4f9871bd2-01
+17:pr=https://github.com/example/repo/pull/1912
+18:pr_head=3f9c2a77b5e1d0a6c8b4e5f2a1b0c9d8e7f6a5b4
+19:x_request=labv1-prtail-relay-4f2a
+--- last 6 rows ---
+pr=https://github.com/example/repo/pull/1912
+pr_head=3f9c2a77b5e1d0a6c8b4e5f2a1b0c9d8e7f6a5b4
+x_request=labv1-prtail-relay-4f2a
+x_request_ts=1793072400
+x_followups=0
+x_platform=x
+### OK phase 1c complete

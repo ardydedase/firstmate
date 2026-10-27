@@ -1,0 +1,57 @@
+### brief + backlog for labv1-heal
+scaffolded: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/data/labv1-heal/brief.md (ship, mode=local-only; replace {TASK} and {FIRSTMATE_SPEC})
+ok: added labv1-heal (ship, repo notes) -> Queued
+task:
+  id: labv1-heal
+  title: Live parked worker (poisoned-input heal scenario)
+  state: queued
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: ship
+  repo: notes
+  priority: "-"
+  created: 2026-10-27
+  closed: "-"
+  deps: none
+  links: none
+  body: ""
+help[2]:
+  - Run `tasks-axi start labv1-heal` to move it to in flight
+  - Run `tasks-axi block labv1-heal --by <other>` to record a dependency
+### spawn
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+spawned labv1-heal harness=claude kind=ship mode=local-only yolo=on window=firstmate:fm-labv1-heal worktree=/private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/treehouse/.treehouse/notes-e0f3a7/2/notes
+spawn rc=0 elapsed=42s
+### wait for the worker's first parked turn
+turn-ended after 22s
+paused [at=1793073225]: parked, waiting for gate file /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/.gate-labv1-heal
+lab zsh
+fm-labv1-prtail 2.1.311
+fm-labv1-heal 2.1.311
+### arm the PR tail, then poison it the way base captain-hold did
+mode=-rw-------
+### product parser on the DAMAGED record (pre-relaunch) - expect FAIL
+=== PRE-RELAUNCH poisoned record (target) ===
+meta: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-heal.meta
+IDENTITY-PARSE: FAIL (fm_pr_metadata_identity_parse exit 1)
+PRIVACY: ok (mode 600 on state device)
+--- key row positions (line numbers) ---
+16:traceparent=00-8bdc57ccd8ef2b9b1a07af31a665989a-aa60cbc76037a94c-01
+17:pr=https://github.com/example/repo/pull/1913
+18:pr_head=7d1e5f0c9b8a7d6e5f4c3b2a1908d7c6b5a4938
+19:x_request=labv1-heal-relay-91bc
+23:decisions_reviewed=1
+24:decision_keys=labv1-heal:1:origin/notes
+--- last 6 rows ---
+x_request=labv1-heal-relay-91bc
+x_request_ts=1793072400
+x_followups=0
+x_platform=x
+decisions_reviewed=1
+decision_keys=labv1-heal:1:origin/notes
+### OK phase 2a complete

@@ -1,0 +1,84 @@
+### lab server windows before teardown
+lab zsh
+fm-labv1-prtail 2.1.311
+fm-labv1-heal 2.1.311
+fm-labv1-base 2.1.311
+### kill the lab's private tmux server
+kill-server sent
+### residual processes referencing a lab path (expect none)
+none
+### remove lab roots: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W and /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.d7A00V
+old lab removed
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-heal.git-hooks/pre-rebase: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-heal.git-hooks/pre-applypatch: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-heal.git-hooks/pre-auto-gc: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-heal.git-hooks/pre-merge-commit: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-heal.git-hooks/post-commit: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-heal.git-hooks/sendemail-validate: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-heal.git-hooks/applypatch-msg: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-heal.git-hooks/prepare-commit-msg: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-heal.git-hooks/post-checkout: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-heal.git-hooks/post-applypatch: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-heal.git-hooks/post-rewrite: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-heal.git-hooks/commit-msg: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-heal.git-hooks/pre-push: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-heal.git-hooks/post-merge: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-heal.git-hooks/pre-commit: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-heal.git-hooks: Directory not empty
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-base.git-hooks/pre-rebase: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-base.git-hooks/pre-applypatch: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-base.git-hooks/pre-auto-gc: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-base.git-hooks/pre-merge-commit: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-base.git-hooks/post-commit: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-base.git-hooks/sendemail-validate: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-base.git-hooks/applypatch-msg: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-base.git-hooks/prepare-commit-msg: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-base.git-hooks/post-checkout: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-base.git-hooks/post-applypatch: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-base.git-hooks/post-rewrite: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-base.git-hooks/commit-msg: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-base.git-hooks/pre-push: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-base.git-hooks/post-merge: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-base.git-hooks/pre-commit: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-base.git-hooks: Directory not empty
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-prtail.git-hooks/pre-rebase: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-prtail.git-hooks/pre-applypatch: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-prtail.git-hooks/pre-auto-gc: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-prtail.git-hooks/pre-merge-commit: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-prtail.git-hooks/post-commit: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-prtail.git-hooks/sendemail-validate: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-prtail.git-hooks/applypatch-msg: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-prtail.git-hooks/prepare-commit-msg: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-prtail.git-hooks/post-checkout: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-prtail.git-hooks/post-applypatch: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-prtail.git-hooks/post-rewrite: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-prtail.git-hooks/commit-msg: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-prtail.git-hooks/pre-push: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-prtail.git-hooks/post-merge: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-prtail.git-hooks/pre-commit: Permission denied
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-prtail.git-hooks: Directory not empty
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state: Directory not empty
+rm: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W: Directory not empty
+lab rm rc=1
+/private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W
+both lab roots gone
+### remove /tmp task-temp roots
+/tmp/fm-labv1-base
+/tmp/fm-labv1-base+e64956e452082dd40ecd7f451d80e8d3fda2cbc3c877ef0804ef32fd22fceb45
+/tmp/fm-labv1-heal
+/tmp/fm-labv1-heal+e64956e452082dd40ecd7f451d80e8d3fda2cbc3c877ef0804ef32fd22fceb45
+/tmp/fm-labv1-prtail
+/tmp/fm-labv1-prtail+a6677377c2355d2ec1dcb01cffe7f8f99cc94a34d1b28a194439f1b4c6d5f3fd
+/tmp/fm-labv1-prtail+e64956e452082dd40ecd7f451d80e8d3fda2cbc3c877ef0804ef32fd22fceb45
+/tmp/fm-labv1-base+e64956e452082dd40ecd7f451d80e8d3fda2cbc3c877ef0804ef32fd22fceb45
+/tmp/fm-labv1-heal+e64956e452082dd40ecd7f451d80e8d3fda2cbc3c877ef0804ef32fd22fceb45
+/tmp/fm-labv1-prtail+a6677377c2355d2ec1dcb01cffe7f8f99cc94a34d1b28a194439f1b4c6d5f3fd
+/tmp/fm-labv1-prtail+e64956e452082dd40ecd7f451d80e8d3fda2cbc3c877ef0804ef32fd22fceb45
+### remove the labs' claude trust entries from ~/.claude.json
+6
+trust-entry removal rc=0
+### worktree final state (must be target, clean)
+7945109a64772cdd4b790a8cf6a6653c2ee2d801
+worktree clean
+HEAD at target
+### OK phase 4 complete

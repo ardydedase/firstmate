@@ -1,0 +1,16 @@
+=== PRE-RELAUNCH armed record (target) ===
+meta: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-prtail.meta
+IDENTITY-PARSE: PASS url=https://github.com/example/repo/pull/1912 provider=github
+PRIVACY: ok (mode 600 on state device)
+--- key row positions (line numbers) ---
+16:traceparent=00-63c8cc8e020c779cebfde5e04f52af3b-40e38e1defd2cd22-01
+17:pr=https://github.com/example/repo/pull/1912
+18:pr_head=3f9c2a77b5e1d0a6c8b4e5f2a1b0c9d8e7f6a5b4
+19:x_request=labv1-prtail-relay-4f2a
+--- last 6 rows ---
+pr=https://github.com/example/repo/pull/1912
+pr_head=3f9c2a77b5e1d0a6c8b4e5f2a1b0c9d8e7f6a5b4
+x_request=labv1-prtail-relay-4f2a
+x_request_ts=1793072400
+x_followups=0
+x_platform=x

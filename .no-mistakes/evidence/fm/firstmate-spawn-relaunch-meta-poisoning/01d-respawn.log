@@ -1,0 +1,58 @@
+### teardown the wedged task (product's own path, backend-native close)
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.d7A00V
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+●  WATCHER DOWN - SUPERVISION IS OFF
+●  1 task(s) in flight, but no watcher has a fresh beacon (last beat: never, grace 300s).
+●  Trust the emitted supervision protocol for this harness; do not use shell & for watcher repair.
+●  This is a supervision warning only; the guarded operation WILL still run.
+●  repair missing watcher supervision according to the session-start block for this harness; do not use shell &.
+●━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+warning: task labv1-prtail still carries an unreconciled Relay request link (labv1-prtail-relay-4f2a) on its task record.
+teardown: reaping leaked worktree process(es) for labv1-prtail: 44170 56729
+teardown: force-killing leaked worktree process(es) for labv1-prtail: 44170
+A new version of treehouse is available: v2.3.0 → v3.1.6
+Run "treehouse update" to update
+
+worktree /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.d7A00V/treehouse/.treehouse/notes-ccda8f/1/notes is not managed by treehouse
+error: treehouse return failed for worktree /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.d7A00V/treehouse/.treehouse/notes-ccda8f/1/notes; teardown aborted
+teardown rc=1
+state after teardown:
+home-summary.json
+labv1-prtail.backlog-close
+labv1-prtail.busy-gen
+labv1-prtail.busy-state
+labv1-prtail.git-hooks
+labv1-prtail.inbox
+labv1-prtail.meta
+operational-inbox
+### switch lab home to the supported live claude posture
+### re-provision brief + backlog row if teardown removed them
+ok: add labv1-prtail already exists -> In flight
+already: true
+task:
+  id: labv1-prtail
+  title: Live parked worker (PR-tail relaunch scenario)
+  state: in_flight
+  blocked: no
+  blocked_by: none
+  held: no
+  hold_reason: "-"
+  hold_kind: "-"
+  hold_until: "-"
+  kind: ship
+  repo: notes
+  priority: "-"
+  created: 2026-10-27
+  closed: "-"
+  deps: none
+  links: none
+  body: ""
+help[2]:
+  - Run `tasks-axi done labv1-prtail --pr <url>` when it ships
+  - Run `tasks-axi block labv1-prtail --by <other>` to record a dependency
+### re-arm trace-context session state (teardown clears state fixtures)
+### re-spawn
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.d7A00V
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+error: task labv1-prtail has a pending authoritative backlog close at /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.d7A00V/state/labv1-prtail.backlog-close; finish or repair that close before dispatching a new worker
+spawn rc=1 elapsed=9s

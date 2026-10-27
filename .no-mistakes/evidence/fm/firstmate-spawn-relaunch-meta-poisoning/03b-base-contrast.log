@@ -1,0 +1,73 @@
+### checkout BASE
+7da4c3621370534ff9689843d2b77f34158057fb
+### repair the fixture pr_head row (39 -> 40 hex), then verify parse
+pr_head rows repaired: 1
+=== PRE-RELAUNCH armed record (BASE, valid fixture) ===
+meta: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-base.meta
+IDENTITY-PARSE: FAIL (fm_pr_metadata_identity_parse exit 1)
+PRIVACY: BAD (mode 644 device 16777232)
+--- key row positions (line numbers) ---
+16:pr=https://github.com/example/repo/pull/1914
+17:pr_head=5c2b8e1f4a7d9b6c3e8f0a2d1b4c5e6f7a8b9c0d
+18:x_request=labv1-base-relay-77ad
+22:control_relaunch_tx=67975.20261027T040432Z.29050
+23:traceparent=00-bfb28c48d6ba9b992b00cc1c3868d7ff-533ed9ca9eb03e0a-01
+--- last 6 rows ---
+x_request=labv1-base-relay-77ad
+x_request_ts=1793072400
+x_followups=0
+x_platform=x
+control_relaunch_tx=67975.20261027T040432Z.29050
+traceparent=00-bfb28c48d6ba9b992b00cc1c3868d7ff-533ed9ca9eb03e0a-01
+### relaunch on BASE (live)
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W
+fm-gate-refuse: gate agent lifecycle permitted only against lab home /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W
+WARNING: watcher still down (same stale episode; last beat: never, grace 300s) - full banner already printed this episode.
+relaunched labv1-base harness=claude from=claude model=sonnet effort=low backend=tmux endpoint=firstmate:fm-labv1-base worktree=/private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/treehouse/.treehouse/notes-e0f3a7/3/notes
+relaunch rc=0 elapsed=35s
+### replacement record at BASE, verbatim
+window=firstmate:fm-labv1-base
+endpoint_task_id=labv1-base
+worktree=/private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/treehouse/.treehouse/notes-e0f3a7/3/notes
+project=/private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/projects/notes
+harness=claude
+approval_mode=auto
+kind=ship
+mode=local-only
+yolo=on
+branch=fm/labv1-base
+tasktmp=/tmp/fm-labv1-base
+model=sonnet
+effort=low
+busy_gen=g1793073938.26757.14829
+spawn_gen=s1793073941.20880.18004
+pr=https://github.com/example/repo/pull/1914
+pr_head=5c2b8e1f4a7d9b6c3e8f0a2d1b4c5e6f7a8b9c0d
+x_request=labv1-base-relay-77ad
+x_request_ts=1793072400
+x_followups=0
+x_platform=x
+control_relaunch_tx=13397.20261027T040528Z.14220
+traceparent=00-bfb28c48d6ba9b992b00cc1c3868d7ff-533ed9ca9eb03e0a-01
+mode=-rw-r--r--
+### product parser on the BASE replacement record - expect FAIL on row order
+=== POST-RELAUNCH record (BASE, valid fixture) ===
+meta: /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.UKvK5W/state/labv1-base.meta
+IDENTITY-PARSE: FAIL (fm_pr_metadata_identity_parse exit 1)
+PRIVACY: BAD (mode 644 device 16777232)
+--- key row positions (line numbers) ---
+16:pr=https://github.com/example/repo/pull/1914
+17:pr_head=5c2b8e1f4a7d9b6c3e8f0a2d1b4c5e6f7a8b9c0d
+18:x_request=labv1-base-relay-77ad
+22:control_relaunch_tx=13397.20261027T040528Z.14220
+23:traceparent=00-bfb28c48d6ba9b992b00cc1c3868d7ff-533ed9ca9eb03e0a-01
+--- last 6 rows ---
+x_request=labv1-base-relay-77ad
+x_request_ts=1793072400
+x_followups=0
+x_platform=x
+control_relaunch_tx=13397.20261027T040528Z.14220
+traceparent=00-bfb28c48d6ba9b992b00cc1c3868d7ff-533ed9ca9eb03e0a-01
+### restore TARGET
+7945109a64772cdd4b790a8cf6a6653c2ee2d801
+### OK phase 3b complete
