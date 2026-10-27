@@ -1,0 +1,40 @@
+
+ ▐▛███▛█   Claude Code v2.1.311
+▝▜██████▀  Opus 5.5 with medium effort · Claude Team
+ ▝▝   ▝▝   ~/.no-mistakes/worktrees/527df5d885a5/01M5XHTF5DAY4XYNGXRNTA9BB4
+
+
+❯ Use your Bash tool to run exactly this one command, then stop and report its exit code. Do not read, modify, or
+  create any other file: bash /Users/adedase/.no-mistakes/evidence/01M5XHTF5DAY4XYNGXRNTA9BB4/scenario1/driver.sh
+
+  Ran 1 shell command
+
+⏺ Captain, the scenario driver finished with exit code 0.
+
+  It printed 12 RESULT ok|... lines and no failures. In short:
+  - The crew-state read uses the meta-file override passed down from the parent process.
+  - When the fleet snapshot runs as a command, it uses its own captured meta file and leaves the session's environment
+    alone.
+  - Sourcing the snapshot into the session shell does not leak the captured path. The shell's override value stays the
+    same, and the status override is still absent.
+  - After both snapshot runs, the crew-state read still uses the override passed down from the parent.
+
+✻ Churned for 18s · done 9:48 AM
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+❯ 
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ⏵⏵ auto mode on (shift+tab to cycle)

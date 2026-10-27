@@ -1,0 +1,6 @@
+== scenario 2 (probe) lab=/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T//fm-lab.Y9d4I6 2026-10-27T02:45:31Z
+worktree HEAD: 7dee60d15e11ec94f594bdca7d3b7852439a8ef5 ()
+fixture: leaktask meta+status+idle busy verdict (gen=g1793069131.3799.309) on lab home
+parent environment will carry the shadow override for scenario 2
+driver dispatched inside the lab session shell
+SCENARIO2_DONE observed

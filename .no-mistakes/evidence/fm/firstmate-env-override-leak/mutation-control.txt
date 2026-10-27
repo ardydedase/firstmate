@@ -1,0 +1,43 @@
+=== mutation control at 2026-10-27T02:38:25Z ===
+worktree HEAD: 7dee60d15e11ec94f594bdca7d3b7852439a8ef5
+--- 1. product tree clean before mutation (expect no output) ---
+--- 2. apply the leaky mutant: prefetch_task_current_states exports the
+      captured FM_CREW_STATE_META_OVERRIDE / FM_CREW_STATE_STATUS_OVERRIDE
+      into the CALLING shell at task dispatch (stale captured path remains
+      after the snapshot returns; the crew_state_json env prefix is untouched) ---
+mutant applied: captured overrides exported at prefetch dispatch
+--- 3. suite against the leaky mutant (expect the new test to FAIL) ---
+1..19
+not ok - sourced snapshot must leave FM_CREW_STATE_META_OVERRIDE unset (missing: 'meta-unset')
+--- output ---
+meta-set
+status-set
+state: unknown · source: none · no current-state source available
+mutant suite exit=1
+--- 4. restore the product file ---
+restored; dirty files now: []
+--- 5. suite at the restored target commit (expect green) ---
+1..19
+ok - crew-state env overrides stay scoped to the snapshot child
+ok - empty fleet snapshot and view use explicit absence markers
+ok - fixture snapshot covers task rows, backlog rows, pointers, stable ordering, and emission-time event age
+ok - home-summary excludes kind=secondmate from unowned_current and terminal_in_flight
+ok - undated captain holds age after a configurable threshold, decided only from structured fields
+ok - captain-hold buckets are total, mutually exclusive, and never decided by prose
+ok - main_inventory discloses orphan/unstructured and clears when inventory is consistent
+ok - backlog normalization preserves strict roles and resolves every blocker compatibly
+ok - snapshot event hints follow reconciled current state
+ok - durable fold keeps an open decision past a later unrelated event
+ok - a live secondmate endpoint preserves unrelated open decisions
+ok - durable captain-held transfer closes the duplicate live status decision
+ok - durable fold clears a decision only on a keyed resolution
+ok - a completed scout's stale decision surfaces as a report pointer, not pending
+ok - a scout still parked at a decision stays pending (terminal clear does not over-fire)
+ok - snapshot includes durable scout reports after teardown
+ok - snapshot parses tasks-axi rows and respects operational overrides
+ok - fleet view renders the snapshot without secondmate peek guidance
+ok - fleet view renders secondmate agent liveness
+FM_TEST_COMPLETE
+restored suite exit=0
+--- 6. final tree state ---
+(clean)

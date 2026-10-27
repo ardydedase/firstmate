@@ -1,0 +1,23 @@
+== s1: session shell initial env (inherited from parent at launch) ==
+RESULT ok|meta-override-inherited-from-parent-launch: /var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T//fm-lab.WDPoG7/shadow/leaktask.meta
+RESULT ok|status-override-absent-at-launch
+== s1: crew-state read consults the parent META override (override takes effect) ==
+s1: state: unknown · source: none · worktree gone (torn down?)
+RESULT ok|meta-override-drives-crew-state-read
+== s1: fleet snapshot run as a command in the session shell ==
+RESULT ok|snapshot-command-ran
+s1: snapshot current_state for leaktask: "state: blocked · source: status-log · live-status-default-note"
+RESULT ok|snapshot-uses-captured-meta-not-ambient-override
+== s1: session shell env after command-run snapshot ==
+RESULT ok|meta-override-unchanged-after-command-run: /var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T//fm-lab.WDPoG7/shadow/leaktask.meta
+RESULT ok|status-override-still-absent-after-command-run
+== s1: fleet snapshot SOURCED into the session shell ==
+s1: source rc=0
+RESULT ok|session-shell-survived-sourcing
+== s1: session shell env after sourced snapshot (the poison window) ==
+RESULT ok|meta-override-unchanged-after-source (no captured-path leak): /var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T//fm-lab.WDPoG7/shadow/leaktask.meta
+RESULT ok|status-override-still-absent-after-source
+== s1: crew-state read after snapshot runs (caller-owned override still steering) ==
+s1: state: unknown · source: none · worktree gone (torn down?)
+RESULT ok|crew-state-read-still-uses-parent-override
+SCENARIO1_DONE

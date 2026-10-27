@@ -1,0 +1,5 @@
+== scenario 3 (probe) lab=/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T//fm-lab.X3Vjo5 2026-10-27T02:45:48Z
+worktree HEAD: 7dee60d15e11ec94f594bdca7d3b7852439a8ef5 ()
+fixture: leaktask meta+status+idle busy verdict (gen=g1793069148.13346.19919) on lab home
+driver dispatched inside the lab session shell
+SCENARIO3_DONE observed

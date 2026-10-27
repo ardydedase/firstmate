@@ -1,0 +1,40 @@
+
+The default interactive shell is now zsh.
+To update your account to use zsh, please run `chsh -s /bin/zsh`.
+For more details, please visit https://support.apple.com/kb/HT208050.
+bash-3.2$ echo "probe session shell: tmux socket $TMUX"
+probe session shell: tmux socket /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.X3Vjo5/tmux/tmux-501/fm
+-lab,13507,1
+bash-3.2$ echo "worktree $(pwd) @ $(git rev-parse --short HEAD); FM_HOME=$FM_HOME"
+bash /Users/adedase/.no-mistakes/evidence/01M5XHTF5DAY4XYNGXRNTA9BB4/scenario3/driver.sh
+worktree /Users/adedase/.no-mistakes/worktrees/527df5d885a5/01M5XHTF5DAY4XYNGXRNTA9BB4 @ 7dee60d1; FM_HOME=/var/folders/
+rz/f8b2_npd0tjf2624px5jw_980000gn/T//fm-lab.X3Vjo5
+bash-3.2$ bash /Users/adedase/.no-mistakes/evidence/01M5XHTF5DAY4XYNGXRNTA9BB4/scenario3/driver.sh
+SCENARIO3_DONE
+== s3: session shell initial env (clean launch - neither override set) ==
+RESULT ok|meta-override-absent-at-launch
+RESULT ok|status-override-absent-at-launch
+== s3: default crew-state read (live state path, live status log) ==
+s3: state: blocked · source: status-log · live-status-default-note
+RESULT ok|default-live-read-blocked-status-log
+== s3: fleet snapshot run as a command in the session shell ==
+RESULT ok|snapshot-command-ran
+s3: snapshot current_state for leaktask: "state: blocked · source: status-log · live-status-default-note"
+RESULT ok|snapshot-default-behavior-unchanged
+== s3: session shell env after command-run snapshot ==
+RESULT ok|meta-override-still-absent-after-command-run
+RESULT ok|status-override-still-absent-after-command-run
+== s3: fleet snapshot SOURCED into the session shell ==
+s3: source rc=0
+RESULT ok|session-shell-survived-sourcing
+== s3: session shell env after sourced snapshot (the poison window) ==
+RESULT ok|meta-override-still-absent-after-source
+RESULT ok|status-override-still-absent-after-source
+== s3: default crew-state read after snapshot runs (default behavior unchanged) ==
+s3: state: blocked · source: status-log · live-status-default-note
+RESULT ok|post-snapshot-read-identical-to-pre-snapshot-read
+== s3: rewrite the LIVE status log; the session read must see the live value ==
+s3: state: failed · source: status-log · live-path-rewrite-proof
+RESULT ok|live-status-rewrite-visible (no stale override poisons the session)
+SCENARIO3_DONE
+bash-3.2$

@@ -1,0 +1,9 @@
+== scenario 3 (claude) lab=/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T//fm-lab.5kf4en 2026-10-27T02:48:39Z
+worktree HEAD: 7dee60d15e11ec94f594bdca7d3b7852439a8ef5 ()
+fixture: leaktask meta+status+idle busy verdict (gen=g1793069320.97318.6817) on lab home
+claude primary launched on the lab socket with scenario 3 parent env
+claude rendering at 4s
+input box ready at +0s
+prompt sent; waiting for SCENARIO3_DONE
+SCENARIO3_DONE observed in the primary
+primary completion report observed at +27s

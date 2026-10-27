@@ -1,0 +1,45 @@
+
+The default interactive shell is now zsh.
+To update your account to use zsh, please run `chsh -s /bin/zsh`.
+For more details, please visit https://support.apple.com/kb/HT208050.
+bash-3.2$ echo "probe session shell: tmux socket $TMUX"
+probe session shell: tmux socket /private/var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T/fm-lab.Y9d4I6/tmux/tmux-501/fm
+-lab,3948,1
+bash-3.2$ echo "worktree $(pwd) @ $(git rev-parse --short HEAD); FM_HOME=$FM_HOME"
+echo "parent env: FM_CREW_STATE_META_OVERRIDE=${FM_CREW_STATE_META_OVERRIDE:-<unset>} FM_CREW_STATE_STATUS_OVERRIDE=${FM
+_CREW_STATE_STATUS_OVERRIDE:-<unset>}"
+worktree /Users/adedase/.no-mistakes/worktrees/527df5d885a5/01M5XHTF5DAY4XYNGXRNTA9BB4 @ 7dee60d1; FM_HOME=/var/folders/
+rz/f8b2_npd0tjf2624px5jw_980000gn/T//fm-lab.Y9d4I6
+bash-3.2$ echo "parent env: FM_CREW_STATE_META_OVERRIDE=${FM_CREW_STATE_META_OVERRIDE:-<unset>} FM_CREW_STATE_STATUS_OVE
+RRIDE=${FM_CREW_STATE_STATUS_OVERRIDE:-<unset>}"
+parent env: FM_CREW_STATE_META_OVERRIDE=<unset> FM_CREW_STATE_STATUS_OVERRIDE=/var/folders/rz/f8b2_npd0tjf2624px5jw_9800
+00gn/T//fm-lab.Y9d4I6/shadow/leaktask.status
+bash-3.2$ bash /Users/adedase/.no-mistakes/evidence/01M5XHTF5DAY4XYNGXRNTA9BB4/scenario2/driver.sh
+SCENARIO2_DONE
+== s2: session shell initial env (inherited from parent at launch) ==
+RESULT ok|meta-override-absent-at-launch
+RESULT ok|status-override-inherited-from-parent-launch: /var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T//fm-lab.Y9d4I6/
+shadow/leaktask.status
+== s2: crew-state read consults the parent STATUS override (override takes effect) ==
+s2: state: blocked · source: status-log · parent-status-override-note
+RESULT ok|status-override-drives-crew-state-read
+== s2: fleet snapshot run as a command in the session shell ==
+RESULT ok|snapshot-command-ran
+s2: snapshot current_state for leaktask: "state: blocked · source: status-log · live-status-default-note"
+RESULT ok|snapshot-uses-captured-status-not-ambient-override
+== s2: session shell env after command-run snapshot ==
+RESULT ok|meta-override-still-absent-after-command-run
+RESULT ok|status-override-unchanged-after-command-run: /var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn/T//fm-lab.Y9d4I6/s
+hadow/leaktask.status
+== s2: fleet snapshot SOURCED into the session shell ==
+s2: source rc=0
+RESULT ok|session-shell-survived-sourcing
+== s2: session shell env after sourced snapshot (the poison window) ==
+RESULT ok|meta-override-still-absent-after-source
+RESULT ok|status-override-unchanged-after-source (no captured-path leak): /var/folders/rz/f8b2_npd0tjf2624px5jw_980000gn
+/T//fm-lab.Y9d4I6/shadow/leaktask.status
+== s2: crew-state read after snapshot runs (caller-owned override still steering) ==
+s2: state: blocked · source: status-log · parent-status-override-note
+RESULT ok|crew-state-read-still-uses-parent-override
+SCENARIO2_DONE
+bash-3.2$
