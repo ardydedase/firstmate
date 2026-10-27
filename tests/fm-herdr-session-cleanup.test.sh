@@ -129,6 +129,7 @@ fixture_panes() {
   printf ']'
 }
 
+# shellcheck disable=SC2329 # Invoked indirectly by the sourced cleanup script; the parse-budget scenario below redefines it.
 fm_backend_herdr_cli() {
   local _session=$1 first=${2:-} second=${3:-} title tabs panes
   shift
